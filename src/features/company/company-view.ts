@@ -48,7 +48,14 @@ export function renderCompanyView(state: AppState): string {
           <div class="certificate-box">
             <div class="panel-title">
               <h3>Certificado A1</h3>
-              <span class="status ${certificateConfigured ? 'emitida' : 'rascunho'}">${certificateLabel}</span>
+              <div class="certificate-actions">
+                <span class="status ${certificateConfigured ? 'emitida' : 'rascunho'}">${certificateLabel}</span>
+                ${
+                  certificateConfigured && canEditFiscal
+                    ? '<button class="danger-btn compact" type="button" data-action="remove-certificate-a1">Remover certificado</button>'
+                    : ''
+                }
+              </div>
             </div>
             <strong class="certificate-expiry">${certificateExpiry}</strong>
             <div class="form-grid two">

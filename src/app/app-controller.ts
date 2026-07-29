@@ -181,6 +181,11 @@ export function createMartirApp(root: HTMLDivElement) {
       return;
     }
 
+    if (action === 'remove-certificate-a1') {
+      await removeCertificateA1();
+      return;
+    }
+
     if (action === 'close-modal') {
       state.modal = null;
       render();
@@ -608,6 +613,32 @@ export function createMartirApp(root: HTMLDivElement) {
     await loadResources(api, state);
     render();
     showToast('Configuracao fiscal atualizada.', 'success');
+  }
+
+  async function removeCertificateA1() {
+    if (!state.configuracaoFiscal?.certificadoA1Configurado) {
+      showToast('Nao ha certificado configurado para remover.', 'error');
+      return;
+    }
+
+    if (
+      !confirm(
+        'Remover o certificado A1 salvo? Para emitir novas notas sera necessario enviar outro certificado.',
+      )
+    ) {
+      return;
+    }
+
+    await updateFiscalConfig(api, {
+      ambienteFiscalPadrao:
+        state.configuracaoFiscal.ambienteFiscalPadrao || 'HOMOLOGACAO',
+      serieDpsPadrao: state.configuracaoFiscal.serieDpsPadrao || '1',
+      removerCertificadoA1: true,
+    });
+
+    await loadResources(api, state);
+    render();
+    showToast('Certificado removido do banco.', 'success');
   }
 
   async function emitRealNote(noteId: string) {
