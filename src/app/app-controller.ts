@@ -176,6 +176,11 @@ export function createMartirApp(root: HTMLDivElement) {
       return;
     }
 
+    if (action === 'toggle-password') {
+      togglePasswordVisibility(button);
+      return;
+    }
+
     if (action === 'close-modal') {
       state.modal = null;
       render();
@@ -759,6 +764,21 @@ export function createMartirApp(root: HTMLDivElement) {
 
   function messageFromError(error: unknown): string {
     return error instanceof Error ? error.message : 'Erro inesperado.';
+  }
+
+  function togglePasswordVisibility(button: HTMLButtonElement) {
+    const targetId = button.dataset.target;
+    const input = targetId ? root.querySelector<HTMLInputElement>(`#${targetId}`) : null;
+
+    if (!input) {
+      return;
+    }
+
+    const shouldShow = input.type === 'password';
+    input.type = shouldShow ? 'text' : 'password';
+    button.textContent = shouldShow ? 'Ocultar' : 'Ver';
+    button.setAttribute('aria-label', shouldShow ? 'Ocultar senha' : 'Mostrar senha');
+    button.title = shouldShow ? 'Ocultar senha' : 'Mostrar senha';
   }
 
   function toDateInputValue(value?: string): string {

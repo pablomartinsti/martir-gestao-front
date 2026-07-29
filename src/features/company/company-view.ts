@@ -58,7 +58,10 @@ export function renderCompanyView(state: AppState): string {
               </div>
               <div class="field">
                 <label for="certificadoA1Senha">Senha do certificado</label>
-                <input id="certificadoA1Senha" name="certificadoA1Senha" type="password" autocomplete="off" ${canEditFiscal ? '' : 'disabled'} />
+                <div class="password-control">
+                  <input id="certificadoA1Senha" name="certificadoA1Senha" type="password" autocomplete="off" ${canEditFiscal ? '' : 'disabled'} />
+                  <button class="action-btn password-toggle" type="button" data-action="toggle-password" data-target="certificadoA1Senha" ${canEditFiscal ? '' : 'disabled'} aria-label="Mostrar senha" title="Mostrar senha">Ver</button>
+                </div>
               </div>
             </div>
             <small class="field-help">Use arquivo A1 .pfx ou .p12.</small>

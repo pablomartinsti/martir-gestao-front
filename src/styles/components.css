@@ -65,6 +65,22 @@
   color: var(--red-600);
 }
 
+.password-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.password-control input {
+  min-width: 0;
+}
+
+.password-toggle {
+  min-height: 42px;
+  white-space: nowrap;
+}
+
 .form-actions {
   display: flex;
   flex-wrap: wrap;
