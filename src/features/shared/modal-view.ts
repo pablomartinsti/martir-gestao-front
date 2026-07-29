@@ -67,7 +67,6 @@ function renderNoteModal(state: AppState, nota: NotaServico): string {
       ${renderMetaBox('Status', statusLabel(nota.status))}
       ${renderMetaBox('Cliente', clientName(state, nota.clienteId))}
       ${renderMetaBox('Valor do servico', formatCurrency(nota.valorServico))}
-      ${renderMetaBox('ISS', formatCurrency(nota.valorIss))}
       ${showFiscalNumber ? renderMetaBox('NFS-e', nota.numeroNfse || '-') : ''}
     </div>
     <div class="modal-note-copy">
