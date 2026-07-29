@@ -1,6 +1,5 @@
 import type { AppState } from '../../app/app-state';
-import { formatDateOnly, formatDocument, readableEnum } from '../../shared/utils/formatters';
-import { renderMetaBox } from '../nfse/nfse-view';
+import { formatDateOnly, formatDocument } from '../../shared/utils/formatters';
 
 export function renderCompanyView(state: AppState): string {
   const empresa = state.empresa;
@@ -25,10 +24,6 @@ export function renderCompanyView(state: AppState): string {
       </div>
     </section>
     <div class="main-stack">
-      <section class="meta-grid">
-        ${renderMetaBox('Cidade/UF', `${empresa?.cidade || '-'} / ${empresa?.uf || '-'}`)}
-        ${renderMetaBox('Regime tributario', readableEnum(empresa?.regimeTributario))}
-      </section>
       ${
         canManageFiscal
           ? `

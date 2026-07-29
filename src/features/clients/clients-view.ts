@@ -11,9 +11,9 @@ export function renderClientsView(state: AppState): string {
   return `
     <section class="section-head">
       <div>
-        <p class="eyebrow">Manutencao</p>
+        <p class="eyebrow">Cadastro</p>
         <h1>Clientes</h1>
-        <p>${state.clientes.length} cliente(s) carregado(s).</p>
+        <p>Cadastre e atualize os tomadores das notas.</p>
       </div>
     </section>
     <section class="resource-grid">

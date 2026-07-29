@@ -6,9 +6,9 @@ export function renderServicesView(state: AppState): string {
   return `
     <section class="section-head">
       <div>
-        <p class="eyebrow">Manutencao</p>
+        <p class="eyebrow">Cadastro</p>
         <h1>Servicos</h1>
-        <p>${state.servicos.length} servico(s) carregado(s).</p>
+        <p>Cadastre os servicos usados na emissao das notas.</p>
       </div>
     </section>
     <section class="resource-grid">

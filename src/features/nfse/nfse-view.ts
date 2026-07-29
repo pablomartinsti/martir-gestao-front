@@ -6,7 +6,6 @@ import {
   formatDate,
   formatDocument,
   formatNumber,
-  percent,
   statusClass,
   statusLabel,
 } from '../../shared/utils/formatters';
@@ -17,25 +16,25 @@ import {
   filterNotesByDashboardPeriod,
   getDashboardDateRange,
   getDashboardMovement,
-  getSummary,
   serviceDetails,
 } from './nfse-selectors';
 
 export function renderDashboardView(state: AppState): string {
   const dashboardNotes = filterNotesByDashboardPeriod(state);
+  const emittedCount = dashboardNotes.filter((nota) => nota.status === 'EMITIDA').length;
 
   return `
     <section class="section-head">
       <div>
-        <p class="eyebrow">Dashboard</p>
+        <p class="eyebrow">Painel</p>
         <h1>NFS-e</h1>
-        <p>Rotina fiscal, notas de servico e acompanhamento operacional.</p>
+        <p>Acompanhe suas notas emitidas, faturamento e ultimas emissoes.</p>
       </div>
-      <button class="primary-btn" data-action="switch-view" data-view="new-note">+ Nova Nota</button>
+      <button class="primary-btn" data-action="switch-view" data-view="new-note">+ Emitir nota</button>
     </section>
     <section class="main-stack">
-      ${renderDashboardPeriodFilter(state, dashboardNotes.length)}
-      ${renderKpis(state, dashboardNotes)}
+      ${renderDashboardPeriodFilter(state, emittedCount)}
+      ${renderKpis(dashboardNotes)}
       <div class="split-grid">
         ${renderMovementChart(state, 'Faturamento por mes', dashboardNotes)}
         ${renderRecentActivity(state, dashboardNotes)}
@@ -51,10 +50,10 @@ export function renderNotesView(state: AppState): string {
     <section class="section-head">
       <div>
         <p class="eyebrow">NFS-e</p>
-        <h1>Notas de Servico</h1>
-        <p>${filtered.length} registro(s) carregado(s).</p>
+        <h1>Notas</h1>
+        <p>${filtered.length} nota(s) encontrada(s).</p>
       </div>
-      <button class="primary-btn" data-action="switch-view" data-view="new-note">+ Nova Nota</button>
+      <button class="primary-btn" data-action="switch-view" data-view="new-note">+ Emitir nota</button>
     </section>
     ${renderNotesTable(state, filtered.slice().reverse(), true)}
   `;
@@ -70,8 +69,8 @@ export function renderNewNoteView(state: AppState): string {
     <section class="section-head">
       <div>
         <p class="eyebrow">NFS-e</p>
-        <h1>Nova Nota</h1>
-        <p>Rascunho criado pela API com calculo de ISS pelo servico selecionado.</p>
+        <h1>Emitir nota</h1>
+        <p>Preencha os dados da prestacao de servico e emita a NFS-e.</p>
       </div>
     </section>
     <section class="form-panel">
@@ -118,7 +117,7 @@ export function renderNewNoteView(state: AppState): string {
           <label for="descricao">Descricao</label>
           <textarea id="descricao" name="descricao" required></textarea>
         </div>
-        <button class="primary-btn" type="submit">Salvar rascunho</button>
+        <button class="primary-btn" type="submit">Emitir nota</button>
       </form>
     </section>
   `;
@@ -139,7 +138,7 @@ export function renderNotesTable(state: AppState, notas: NotaServico[], withTool
   return `
     <section class="table-panel">
       <div class="panel-title">
-        <h2>Notas de Servico</h2>
+        <h2>Notas</h2>
         ${withToolbar ? '' : '<button class="action-btn" data-action="switch-view" data-view="notes">Ver todas</button>'}
       </div>
       ${
@@ -231,7 +230,7 @@ function renderDashboardPeriodFilter(state: AppState, notesCount: number): strin
       <div class="period-summary">
         <span>Periodo</span>
         <strong>${formatDateOnly(range.start)} a ${formatDateOnly(range.end)}</strong>
-        <small>${formatNumber(notesCount)} nota(s) no periodo</small>
+        <small>${formatNumber(notesCount)} nota(s) emitida(s) no periodo</small>
       </div>
       <form id="dashboard-range-form" class="date-range-form">
         <div class="field">
@@ -258,14 +257,14 @@ function formatDateOnly(value: string): string {
   return new Intl.DateTimeFormat('pt-BR').format(new Date(year, month - 1, day));
 }
 
-function renderKpis(state: AppState, notas: NotaServico[]): string {
-  const summary = getSummary(state, notas);
+function renderKpis(notas: NotaServico[]): string {
+  const emitidas = notas.filter((nota) => nota.status === 'EMITIDA');
+  const faturamento = emitidas.reduce((total, nota) => total + Number(nota.valorServico || 0), 0);
+  const iss = emitidas.reduce((total, nota) => total + Number(nota.valorIss || 0), 0);
   const cards = [
-    { label: 'Emitidas', value: summary.emitidas, hint: percent(summary.emitidas, summary.total, 'do periodo'), tone: 'green' },
-    { label: 'Rascunhos', value: summary.rascunhos, hint: percent(summary.rascunhos, summary.total, 'do periodo'), tone: '' },
-    { label: 'Erros', value: summary.erros, hint: percent(summary.erros, summary.total, 'do periodo'), tone: 'red' },
-    { label: 'Canceladas', value: summary.canceladas, hint: percent(summary.canceladas, summary.total, 'do periodo'), tone: 'gray' },
-    { label: 'Substituidas', value: summary.substituidas, hint: percent(summary.substituidas, summary.total, 'do periodo'), tone: 'amber' },
+    { label: 'Notas emitidas', value: formatNumber(emitidas.length), hint: 'no periodo', tone: 'green', symbol: 'NF' },
+    { label: 'Faturamento', value: formatCurrency(faturamento), hint: 'notas emitidas', tone: 'amber', symbol: 'R$' },
+    { label: 'ISS', value: formatCurrency(iss), hint: 'calculado nas notas', tone: '', symbol: 'IS' },
   ];
 
   return `
@@ -274,10 +273,10 @@ function renderKpis(state: AppState, notas: NotaServico[]): string {
         .map(
           (card) => `
             <article class="kpi-card">
-              <span class="kpi-symbol ${card.tone}">${card.label.slice(0, 2).toUpperCase()}</span>
+              <span class="kpi-symbol ${card.tone}">${card.symbol}</span>
               <div>
                 <span>${card.label}</span>
-                <strong>${formatNumber(card.value)}</strong>
+                <strong>${card.value}</strong>
                 <small>${card.hint}</small>
               </div>
             </article>
@@ -321,6 +320,7 @@ function renderMovementChart(state: AppState, title: string, notas = state.notas
 
 function renderRecentActivity(state: AppState, notas = state.notas): string {
   const recent = notas
+    .filter((nota) => nota.status === 'EMITIDA')
     .slice()
     .sort((a, b) => new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime())
     .slice(0, 5);
@@ -328,7 +328,7 @@ function renderRecentActivity(state: AppState, notas = state.notas): string {
   return `
     <section class="events-panel">
       <div class="panel-title">
-        <h2>Atividade recente</h2>
+        <h2>Notas emitidas recentes</h2>
         <button class="action-btn" data-action="switch-view" data-view="notes">Ver notas</button>
       </div>
       ${
@@ -349,7 +349,7 @@ function renderRecentActivity(state: AppState, notas = state.notas): string {
                 )
                 .join('')}
             </div>`
-          : '<div class="empty">Nenhuma movimentacao encontrada.</div>'
+          : '<div class="empty">Nenhuma nota emitida no periodo.</div>'
       }
     </section>
   `;

@@ -92,7 +92,7 @@ export function statusLabel(status?: StatusNota): string {
     EMITIDA: 'Emitida',
     ERRO: 'Erro',
     PROCESSANDO: 'Processando',
-    RASCUNHO: 'Rascunho',
+    RASCUNHO: 'Pendente',
     SUBSTITUIDA: 'Substituida',
   };
 

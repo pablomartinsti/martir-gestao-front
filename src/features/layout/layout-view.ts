@@ -37,7 +37,6 @@ export function renderSidebar(state: AppState): string {
               <button class="nav-item ${state.view === item.view ? 'active' : ''}" data-action="switch-view" data-view="${item.view}">
                 <span class="nav-icon">${item.icon}</span>
                 <strong>${item.label}</strong>
-                ${item.view === 'dashboard' ? '<span aria-hidden="true">›</span>' : ''}
               </button>
             `,
           )
@@ -47,7 +46,6 @@ export function renderSidebar(state: AppState): string {
         <small>Empresa ativa</small>
         <strong>${escapeHtml(empresa?.razaoSocial || empresa?.nomeFantasia || 'Martir Contabil')}</strong>
         <span>CNPJ<br />${formatDocument(empresa?.cnpj) || '-'}</span>
-        <span>Inscricao Municipal<br />${escapeHtml(empresa?.inscricaoMunicipal || '-')}</span>
       </div>
     </aside>
   `;
@@ -82,7 +80,7 @@ export function renderTopbar(state: AppState): string {
 }
 
 export function renderLoading(): string {
-  return '<section class="empty">Carregando dados da API...</section>';
+  return '<section class="empty">Carregando dados...</section>';
 }
 
 function canManageCompanySettings(state: AppState): boolean {

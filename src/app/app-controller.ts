@@ -405,10 +405,10 @@ export function createMartirApp(root: HTMLDivElement) {
       '';
 
     if (!clienteId) {
-      throw new Error('Escolha um cliente cadastrado na lista antes de salvar a nota.');
+      throw new Error('Escolha um cliente cadastrado na lista antes de emitir a nota.');
     }
 
-    await createNote(
+    const note = await createNote(
       api,
       compactBody({
         clienteId,
@@ -421,10 +421,30 @@ export function createMartirApp(root: HTMLDivElement) {
       }),
     );
 
-    await loadResources(api, state);
-    state.view = 'notes';
-    render();
-    showToast('Rascunho criado.', 'success');
+    await emitCreatedNote(note.id);
+  }
+
+  async function emitCreatedNote(noteId: string) {
+    try {
+      const readiness = await getReadiness(api, noteId);
+
+      if (!readiness.pronto) {
+        throw new Error(
+          `Pendencias fiscais: ${readiness.pendencias.join(', ') || 'revise a nota'}`,
+        );
+      }
+
+      await sendDps(api, noteId);
+      await loadResources(api, state);
+      state.view = 'dashboard';
+      render();
+      showToast('Nota enviada para emissao.', 'success');
+    } catch (error) {
+      await loadResources(api, state);
+      state.view = 'notes';
+      render();
+      throw new Error(`A nota foi criada, mas nao foi emitida. ${messageFromError(error)}`);
+    }
   }
 
   function submitDashboardRange(formData: FormData) {
@@ -881,7 +901,7 @@ export function createMartirApp(root: HTMLDivElement) {
       data: replacement,
     };
     render();
-    showToast('Rascunho de substituicao criado. Confira e emita.', 'success');
+    showToast('Nota de substituicao criada. Confira e emita.', 'success');
   }
 
   async function mutateNote(noteId: string, mutation: () => Promise<unknown>, successMessage: string) {
