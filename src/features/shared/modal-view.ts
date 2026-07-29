@@ -6,9 +6,10 @@ import type {
 } from '../../domain/models';
 import { escapeHtml } from '../../shared/utils/dom';
 import { formatCurrency, formatDate, readableEnum, statusLabel } from '../../shared/utils/formatters';
+import { canDownloadDanfse } from '../nfse/components/note-action-rules';
 import { clientName, serviceName } from '../nfse/nfse-selectors';
-import { renderMetaBox } from '../nfse/nfse-view';
 import { serviceOptionLabel } from '../services/service-labels';
+import { renderMetaBox } from './meta-box';
 
 export function renderModal(state: AppState): string {
   if (!state.modal) {
@@ -91,7 +92,7 @@ function renderNoteActions(nota: NotaServico): string {
     actions.push(`<button class="danger-btn" data-action="delete-draft-note" data-id="${nota.id}">Excluir rascunho</button>`);
   }
 
-  if (['EMITIDA', 'SUBSTITUIDA', 'CANCELADA'].includes(nota.status) && nota.chaveAcesso) {
+  if (canDownloadDanfse(nota)) {
     actions.push(`<button class="action-btn" data-action="download-danfse" data-id="${nota.id}">Baixar PDF</button>`);
   }
 
