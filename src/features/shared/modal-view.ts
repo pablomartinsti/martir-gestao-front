@@ -91,7 +91,7 @@ function renderNoteActions(nota: NotaServico): string {
     actions.push(`<button class="danger-btn" data-action="delete-draft-note" data-id="${nota.id}">Excluir rascunho</button>`);
   }
 
-  if ((nota.status === 'EMITIDA' || nota.status === 'SUBSTITUIDA') && nota.chaveAcesso) {
+  if (['EMITIDA', 'SUBSTITUIDA', 'CANCELADA'].includes(nota.status) && nota.chaveAcesso) {
     actions.push(`<button class="action-btn" data-action="download-danfse" data-id="${nota.id}">Baixar PDF</button>`);
   }
 
