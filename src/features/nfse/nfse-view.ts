@@ -106,7 +106,13 @@ export function renderNewNoteView(state: AppState): string {
         <div class="form-grid two">
           <div class="field">
             <label for="valorServico">Valor do servico</label>
-            <input id="valorServico" name="valorServico" type="number" min="0.01" step="0.01" required />
+            <input
+              id="valorServico"
+              name="valorServico"
+              inputmode="decimal"
+              placeholder="Ex.: 200,00"
+              required
+            />
           </div>
           <div class="field">
             <label for="dataCompetencia">Data de competencia</label>

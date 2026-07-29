@@ -413,7 +413,7 @@ export function createMartirApp(root: HTMLDivElement) {
       compactBody({
         clienteId,
         servicoId: formData.get('servicoId'),
-        valorServico: Number(formData.get('valorServico')),
+        valorServico: parseCurrencyField(formData, 'valorServico'),
         descricao: formData.get('descricao'),
         serieDps: formData.get('serieDps'),
         dataCompetencia: formData.get('dataCompetencia'),
@@ -885,7 +885,7 @@ export function createMartirApp(root: HTMLDivElement) {
     const replacement = await replaceNfse(api, noteId, {
       clienteId: note.clienteId,
       servicoId: note.servicoId,
-      valorServico: Number(valorServico.replace(',', '.')),
+      valorServico: parseCurrencyValue(valorServico),
       descricao: descricao.trim(),
       serieDps: note.serieDps,
       dataCompetencia,
@@ -1115,6 +1115,36 @@ export function createMartirApp(root: HTMLDivElement) {
 
   function textField(formData: FormData, field: string): string {
     return String(formData.get(field) || '').trim();
+  }
+
+  function parseCurrencyField(formData: FormData, field: string): number {
+    return parseCurrencyValue(textField(formData, field));
+  }
+
+  function parseCurrencyValue(value: string): number {
+    const cleanValue = value
+      .replace(/[^\d,.-]/g, '')
+      .trim();
+    const normalized = cleanValue.includes(',')
+      ? cleanValue.replace(/\./g, '').replace(',', '.')
+      : normalizeCurrencyWithDot(cleanValue);
+    const parsed = Number(normalized);
+
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      throw new Error('Informe um valor de servico valido.');
+    }
+
+    return parsed;
+  }
+
+  function normalizeCurrencyWithDot(value: string): string {
+    const parts = value.split('.');
+
+    if (parts.length === 2 && parts[1].length === 3) {
+      return parts.join('');
+    }
+
+    return value;
   }
 
   function fileToBase64(file: File): Promise<string> {
