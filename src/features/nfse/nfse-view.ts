@@ -77,6 +77,7 @@ export function renderNewNoteView(state: AppState): string {
       <form id="note-form" class="form-grid">
         <input type="hidden" name="serieDps" value="${escapeHtml(serieDps)}" />
         <input type="hidden" name="codigoMunicipioPrestacao" value="${escapeHtml(codigoMunicipioPrestacao)}" />
+        <input type="hidden" name="dataCompetencia" value="${todayInputValue()}" />
         <div class="form-grid two note-main-row">
           <div class="field note-client-field">
             <label for="clienteBusca">Cliente</label>
@@ -103,21 +104,15 @@ export function renderNewNoteView(state: AppState): string {
             </select>
           </div>
         </div>
-        <div class="form-grid two">
-          <div class="field">
-            <label for="valorServico">Valor do servico</label>
-            <input
-              id="valorServico"
-              name="valorServico"
-              inputmode="decimal"
-              placeholder="Ex.: 200 ou 200,00"
-              required
-            />
-          </div>
-          <div class="field">
-            <label for="dataCompetencia">Competencia do servico</label>
-            <input id="dataCompetencia" name="dataCompetencia" type="date" value="${todayInputValue()}" required />
-          </div>
+        <div class="field">
+          <label for="valorServico">Valor do servico</label>
+          <input
+            id="valorServico"
+            name="valorServico"
+            inputmode="decimal"
+            placeholder="Ex.: 200 ou 200,00"
+            required
+          />
         </div>
         <div class="field">
           <label for="descricao">Descricao</label>
