@@ -11,6 +11,7 @@ import { renderAppShell } from '../features/layout/layout-view';
 import {
   cancelNfse,
   createNote,
+  deleteDraftNote,
   getReadiness,
   replaceNfse,
   sendDps,
@@ -290,6 +291,11 @@ export function createMartirApp(root: HTMLDivElement) {
 
     if (action === 'cancel-nfse') {
       await cancelRealNote(noteId);
+      return;
+    }
+
+    if (action === 'delete-draft-note') {
+      await deleteDraft(noteId);
       return;
     }
 
@@ -852,6 +858,18 @@ export function createMartirApp(root: HTMLDivElement) {
     );
   }
 
+  async function deleteDraft(noteId: string) {
+    if (!confirm('Excluir este rascunho? Essa acao nao pode ser desfeita.')) {
+      return;
+    }
+
+    await mutateNote(
+      noteId,
+      () => deleteDraftNote(api, noteId),
+      'Rascunho excluido.',
+    );
+  }
+
   async function createReplacementDraft(noteId: string) {
     const note = state.notas.find((item) => item.id === noteId);
 
@@ -1039,6 +1057,7 @@ export function createMartirApp(root: HTMLDivElement) {
       'service-status': 'Salvando...',
       'client-fetch-cnpj': 'Buscando...',
       'emit-note': 'Emitindo...',
+      'delete-draft-note': 'Excluindo...',
       'cancel-nfse': 'Cancelando...',
       'replace-nfse': 'Preparando...',
     };

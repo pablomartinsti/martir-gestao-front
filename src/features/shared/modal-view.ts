@@ -89,6 +89,7 @@ function renderNoteActions(nota: NotaServico): string {
 
   if (nota.status === 'RASCUNHO') {
     actions.push(`<button class="primary-btn" data-action="emit-note" data-id="${nota.id}">Emitir NFS-e</button>`);
+    actions.push(`<button class="danger-btn" data-action="delete-draft-note" data-id="${nota.id}">Excluir rascunho</button>`);
   }
 
   if (nota.status === 'EMITIDA') {

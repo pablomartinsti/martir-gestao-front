@@ -30,6 +30,12 @@ export function sendDps(api: ApiClient, noteId: string) {
   });
 }
 
+export function deleteDraftNote(api: ApiClient, noteId: string) {
+  return api<void>(`/notas-servico/${noteId}`, {
+    method: 'DELETE',
+  });
+}
+
 export function cancelNfse(api: ApiClient, noteId: string, motivo: string) {
   return api<{ nota: NotaServico }>(`/notas-servico/${noteId}/cancelar-nfse`, {
     method: 'POST',
