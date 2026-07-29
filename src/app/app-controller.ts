@@ -19,7 +19,6 @@ import {
   renderDashboardView,
   renderNewNoteView,
   renderNotesView,
-  renderReportsView,
 } from '../features/nfse/nfse-view';
 import { createService, updateServiceStatus } from '../features/services/services-api';
 import { renderServicesView } from '../features/services/services-view';
@@ -130,8 +129,6 @@ export function createMartirApp(root: HTMLDivElement) {
         return renderServicesView(state);
       case 'company':
         return renderCompanyView(state);
-      case 'reports':
-        return renderReportsView(state);
       default:
         return renderDashboardView(state);
     }

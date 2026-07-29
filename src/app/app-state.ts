@@ -14,8 +14,7 @@ export type AppView =
   | 'new-note'
   | 'clients'
   | 'services'
-  | 'company'
-  | 'reports';
+  | 'company';
 
 export type AuthMode = 'login' | 'onboarding';
 export interface ToastState {

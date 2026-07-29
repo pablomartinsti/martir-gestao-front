@@ -144,31 +144,6 @@ function todayInputValue(): string {
   return offsetDate.toISOString().slice(0, 10);
 }
 
-export function renderReportsView(state: AppState): string {
-  const summary = getSummary(state);
-  const totalValue = state.notas.reduce((total, nota) => total + Number(nota.valorServico || 0), 0);
-  const totalIss = state.notas.reduce((total, nota) => total + Number(nota.valorIss || 0), 0);
-
-  return `
-    <section class="section-head">
-      <div>
-        <p class="eyebrow">Relatorios</p>
-        <h1>Resumo NFS-e</h1>
-        <p>Consolidado calculado no painel com os dados da API.</p>
-      </div>
-    </section>
-    <div class="main-stack">
-      <section class="meta-grid">
-        ${renderMetaBox('Notas', formatNumber(summary.total))}
-        ${renderMetaBox('Valor dos servicos', formatCurrency(totalValue))}
-        ${renderMetaBox('ISS calculado', formatCurrency(totalIss))}
-      </section>
-      ${renderMovementChart(state, 'Faturamento por mes')}
-      ${renderNotesTable(state, filterNotes(state, state.notas).slice().reverse().slice(0, 10), false)}
-    </div>
-  `;
-}
-
 export function renderNotesTable(state: AppState, notas: NotaServico[], withToolbar: boolean): string {
   return `
     <section class="table-panel">
