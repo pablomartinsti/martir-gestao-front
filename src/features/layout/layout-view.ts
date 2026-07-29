@@ -64,7 +64,6 @@ export function renderTopbar(state: AppState): string {
   return `
     <header class="topbar">
       <div class="brand-inline">
-        <button class="icon-btn" data-action="switch-view" data-view="dashboard" aria-label="Abrir modulos">≡</button>
         <span>Martir Gestao</span>
       </div>
       <div class="topbar-center">
@@ -76,7 +75,7 @@ export function renderTopbar(state: AppState): string {
       </div>
       <div class="topbar-actions">
         <span class="avatar">${getInitials(state.usuario?.nome || state.usuario?.email || 'MC')}</span>
-        <button class="icon-btn" data-action="logout" aria-label="Sair">×</button>
+        <button class="ghost-btn" data-action="logout" aria-label="Sair">Sair</button>
       </div>
     </header>
   `;
