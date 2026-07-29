@@ -3,8 +3,8 @@ import type {
   ConfiguracaoFiscalEmpresa,
   Empresa,
   NotaServico,
-  Usuario,
   Servico,
+  Usuario,
 } from '../domain/models';
 import { DEFAULT_API_URL, STORAGE_KEYS } from '../shared/config';
 
@@ -15,7 +15,6 @@ export type AppView =
   | 'clients'
   | 'services'
   | 'company'
-  | 'users'
   | 'reports';
 
 export type AuthMode = 'login' | 'onboarding';
@@ -39,9 +38,7 @@ export interface AppState {
   notas: NotaServico[];
   clientes: Cliente[];
   servicos: Servico[];
-  usuarios: Usuario[];
   configuracaoFiscal: ConfiguracaoFiscalEmpresa | null;
-  usuariosErro: string;
   editingClientId: string;
   loading: boolean;
   view: AppView;
@@ -62,9 +59,7 @@ export function createInitialState(): AppState {
     notas: [],
     clientes: [],
     servicos: [],
-    usuarios: [],
     configuracaoFiscal: null,
-    usuariosErro: '',
     editingClientId: '',
     loading: false,
     view: 'dashboard',

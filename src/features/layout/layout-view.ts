@@ -21,7 +21,7 @@ export function renderSidebar(state: AppState): string {
   const empresa = state.empresa;
   const canManageSettings = canManageCompanySettings(state);
   const visibleNavItems = navItems.filter(
-    (item) => canManageSettings || !['company', 'users'].includes(item.view),
+    (item) => canManageSettings || item.view !== 'company',
   );
 
   return `

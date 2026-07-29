@@ -25,7 +25,6 @@ import { createService, updateServiceStatus } from '../features/services/service
 import { renderServicesView } from '../features/services/services-view';
 import { renderModal } from '../features/shared/modal-view';
 import { renderToast } from '../features/shared/toast-view';
-import { renderUsersView } from '../features/users/users-view';
 import { DEFAULT_API_URL, STORAGE_KEYS } from '../shared/config';
 import { createApiClient } from '../shared/api/http-client';
 import { compactBody } from '../shared/utils/dom';
@@ -131,8 +130,6 @@ export function createMartirApp(root: HTMLDivElement) {
         return renderServicesView(state);
       case 'company':
         return renderCompanyView(state);
-      case 'users':
-        return renderUsersView(state);
       case 'reports':
         return renderReportsView(state);
       default:
@@ -778,7 +775,6 @@ export function createMartirApp(root: HTMLDivElement) {
     state.notas = [];
     state.clientes = [];
     state.servicos = [];
-    state.usuarios = [];
     state.modal = null;
     localStorage.removeItem(STORAGE_KEYS.token);
   }
