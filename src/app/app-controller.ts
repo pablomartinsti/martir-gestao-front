@@ -447,7 +447,7 @@ export function createMartirApp(root: HTMLDivElement) {
     await emitCreatedNote(note.id);
   }
 
-  async function emitCreatedNote(noteId: string) {
+  async function emitCreatedNote(noteId: string, successMessage = 'Nota enviada para emissao.') {
     try {
       const readiness = await getReadiness(api, noteId);
 
@@ -459,7 +459,7 @@ export function createMartirApp(root: HTMLDivElement) {
       await loadResources(api, state);
       state.view = 'dashboard';
       render();
-      showToast('Nota enviada para emissao.', 'success');
+      showToast(successMessage, 'success');
     } catch (error) {
       await loadResources(api, state);
       state.view = 'notes';
@@ -916,14 +916,7 @@ export function createMartirApp(root: HTMLDivElement) {
       motivoSubstituicao,
     });
 
-    await loadResources(api, state);
-    state.modal = {
-      type: 'note',
-      title: `Substituicao DPS ${replacement.numeroDps || replacement.id}`,
-      data: replacement,
-    };
-    render();
-    showToast('Nota de substituicao criada. Confira e emita.', 'success');
+    await emitCreatedNote(replacement.id, 'Substituicao enviada para emissao.');
   }
 
   async function mutateNote(noteId: string, mutation: () => Promise<unknown>, successMessage: string) {
@@ -1036,7 +1029,7 @@ export function createMartirApp(root: HTMLDivElement) {
       'service-form': 'Salvando servico...',
       'fiscal-config-form': 'Salvando certificado...',
       'note-form': 'Emitindo nota...',
-      'replacement-form': 'Gerando substituicao...',
+      'replacement-form': 'Emitindo substituicao...',
       'dashboard-range-form': 'Aplicando...',
       'search-form': 'Buscando...',
     };

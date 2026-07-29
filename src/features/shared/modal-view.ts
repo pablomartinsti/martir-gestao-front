@@ -149,7 +149,7 @@ function renderReplacementModal(state: AppState, nota: NotaServico): string {
         <textarea id="replacementMotivo" name="motivoSubstituicao" minlength="15" required>Correcao de dados da NFS-e emitida</textarea>
       </div>
       <div class="toolbar">
-        <button class="primary-btn" type="submit">Gerar substituicao</button>
+        <button class="primary-btn" type="submit">Emitir substituicao</button>
         <button class="ghost-btn" type="button" data-action="close-modal">Cancelar</button>
       </div>
     </form>
