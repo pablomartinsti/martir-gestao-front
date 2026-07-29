@@ -1,6 +1,5 @@
 import './styles/index.css';
 import { createMartirApp } from './app/app-controller';
-import './styles/responsive.css';
 
 const root = document.querySelector<HTMLDivElement>('#app');
 

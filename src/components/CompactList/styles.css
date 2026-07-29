@@ -32,3 +32,15 @@
 .list-actions {
   flex: 0 0 auto;
 }
+
+@media (max-width: 820px) {
+  .list-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .list-actions {
+    display: flex;
+    justify-content: flex-start;
+  }
+}
