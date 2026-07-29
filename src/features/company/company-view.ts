@@ -1,0 +1,67 @@
+import type { AppState } from '../../app/app-state';
+import { formatDocument, readableEnum } from '../../shared/utils/formatters';
+import { renderMetaBox } from '../nfse/nfse-view';
+
+export function renderCompanyView(state: AppState): string {
+  const empresa = state.empresa;
+  const config = state.configuracaoFiscal;
+  const canEditFiscal = state.usuario?.perfil === 'DONO';
+  const certificateConfigured =
+    Boolean(config?.certificadoA1Configurado) || config?.certificadoA1SenhaConfigurada;
+  const certificateLabel = certificateConfigured
+    ? config?.certificadoA1NomeArquivo || 'Configurado'
+    : 'Nao configurado';
+
+  return `
+    <section class="section-head">
+      <div>
+        <p class="eyebrow">Empresa</p>
+        <h1>${empresa?.razaoSocial || 'Empresa'}</h1>
+        <p>${formatDocument(empresa?.cnpj) || ''}</p>
+      </div>
+    </section>
+    <div class="main-stack">
+      <section class="meta-grid">
+        ${renderMetaBox('Cidade/UF', `${empresa?.cidade || '-'} / ${empresa?.uf || '-'}`)}
+        ${renderMetaBox('Regime tributario', readableEnum(empresa?.regimeTributario))}
+        ${renderMetaBox('Ambiente fiscal', readableEnum(config?.ambienteFiscalPadrao || 'HOMOLOGACAO'))}
+      </section>
+      <section class="form-panel">
+        <div class="panel-title"><h2>Configuracao fiscal</h2></div>
+        <form id="fiscal-config-form" class="form-grid">
+          <div class="form-grid two">
+            <div class="field">
+              <label for="ambienteFiscalPadrao">Ambiente fiscal padrao</label>
+              <select id="ambienteFiscalPadrao" name="ambienteFiscalPadrao" ${canEditFiscal ? '' : 'disabled'}>
+                <option value="HOMOLOGACAO" ${config?.ambienteFiscalPadrao === 'HOMOLOGACAO' ? 'selected' : ''}>Homologacao</option>
+                <option value="PRODUCAO" ${config?.ambienteFiscalPadrao === 'PRODUCAO' ? 'selected' : ''}>Producao</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="serieDpsPadrao">Serie DPS padrao</label>
+              <input id="serieDpsPadrao" name="serieDpsPadrao" value="${config?.serieDpsPadrao || '1'}" ${canEditFiscal ? '' : 'disabled'} />
+            </div>
+          </div>
+          <div class="certificate-box">
+            <div class="panel-title">
+              <h3>Certificado A1</h3>
+              <span class="status ${certificateConfigured ? 'emitida' : 'rascunho'}">${certificateLabel}</span>
+            </div>
+            <div class="form-grid two">
+              <div class="field">
+                <label for="certificadoA1Arquivo">Arquivo</label>
+                <input id="certificadoA1Arquivo" name="certificadoA1Arquivo" type="file" accept=".pfx,.p12" ${canEditFiscal ? '' : 'disabled'} />
+              </div>
+              <div class="field">
+                <label for="certificadoA1Senha">Senha do certificado</label>
+                <input id="certificadoA1Senha" name="certificadoA1Senha" type="password" autocomplete="off" ${canEditFiscal ? '' : 'disabled'} />
+              </div>
+            </div>
+            <small class="field-help">Use arquivo A1 .pfx ou .p12.</small>
+          </div>
+          <button class="primary-btn" type="submit" ${canEditFiscal ? '' : 'disabled'}>Salvar configuracao</button>
+        </form>
+      </section>
+    </div>
+  `;
+}

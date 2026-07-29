@@ -1,0 +1,182 @@
+.app-shell {
+  display: grid;
+  min-height: 100vh;
+  grid-template-columns: 282px minmax(0, 1fr);
+}
+
+.sidebar {
+  display: flex;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  flex-direction: column;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    linear-gradient(180deg, rgba(201, 163, 74, 0.08), transparent 28%),
+    var(--navy-950);
+  color: #ffffff;
+}
+
+.sidebar-header {
+  display: flex;
+  min-height: 86px;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-logo {
+  width: 196px;
+  max-width: 100%;
+}
+
+.sidebar-section-title {
+  margin: 18px 20px 10px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.side-nav {
+  display: grid;
+  gap: 4px;
+  padding: 0 10px;
+}
+
+.nav-item {
+  display: grid;
+  min-height: 48px;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.82);
+  padding: 0 12px;
+  text-align: left;
+}
+
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  box-shadow: inset 3px 0 0 var(--gold-600);
+}
+
+.nav-icon,
+.mini-icon {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  color: var(--gold-500);
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.sidebar-company {
+  margin: auto 20px 22px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 16px;
+}
+
+.sidebar-company small {
+  display: block;
+  color: rgba(255, 255, 255, 0.62);
+  font-weight: 800;
+}
+
+.sidebar-company strong {
+  display: block;
+  margin-top: 5px;
+}
+
+.sidebar-company span {
+  display: block;
+  margin-top: 12px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.82rem;
+}
+
+.workspace {
+  min-width: 0;
+  background: var(--surface-soft);
+}
+
+.topbar {
+  display: grid;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  min-height: 72px;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.92);
+  padding: 0 28px;
+  backdrop-filter: blur(12px);
+}
+
+.brand-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.08rem;
+  font-weight: 900;
+}
+
+.topbar-center {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-700);
+}
+
+.company-picker {
+  display: grid;
+  min-width: 310px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #ffffff;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.company-picker span {
+  color: var(--ink-500);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.company-picker strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  display: inline-grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--navy-850);
+  color: #ffffff;
+  font-weight: 900;
+}
+
+.content {
+  padding: 24px 28px 34px;
+}
