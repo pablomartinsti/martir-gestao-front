@@ -8,6 +8,7 @@ import { escapeHtml } from '../../shared/utils/dom';
 import { formatCurrency, formatDate, readableEnum, statusLabel } from '../../shared/utils/formatters';
 import { clientName, serviceDetails } from '../nfse/nfse-selectors';
 import { renderMetaBox } from '../nfse/nfse-view';
+import { serviceOptionLabel } from '../services/service-labels';
 
 export function renderModal(state: AppState): string {
   if (!state.modal) {
@@ -49,6 +50,10 @@ function renderModalBody(state: AppState): string {
 
   if (modal.type === 'readiness') {
     return renderReadinessModal(modal.data as ProntidaoFiscal);
+  }
+
+  if (modal.type === 'replacement') {
+    return renderReplacementModal(state, modal.data as NotaServico);
   }
 
   return '';
@@ -95,6 +100,67 @@ function renderNoteActions(nota: NotaServico): string {
   }
 
   return `<div class="toolbar">${actions.join('')}</div>`;
+}
+
+function renderReplacementModal(state: AppState, nota: NotaServico): string {
+  const activeServices = state.servicos.filter((servico) => servico.ativo);
+
+  return `
+    <form id="replacement-form" class="form-grid">
+      <input type="hidden" name="notaId" value="${escapeHtml(nota.id)}" />
+      <div class="meta-grid">
+        ${renderMetaBox('Nota original', nota.numeroNfse || nota.numeroDps || '-')}
+        ${renderMetaBox('Cliente', clientName(state, nota.clienteId))}
+        ${renderMetaBox('Valor atual', formatCurrency(nota.valorServico))}
+        ${renderMetaBox('Status', statusLabel(nota.status))}
+      </div>
+      <div class="field">
+        <label for="replacementValorServico">Valor da nota substituta</label>
+        <input
+          id="replacementValorServico"
+          name="valorServico"
+          inputmode="decimal"
+          value="${escapeHtml(currencyInputValue(nota.valorServico))}"
+          placeholder="Ex.: 200 ou 200,00"
+          required
+        />
+      </div>
+      <div class="field">
+        <label for="replacementServicoId">Servico da nota substituta</label>
+        <select id="replacementServicoId" name="servicoId" required>
+          <option value="">Selecione</option>
+          ${activeServices
+            .map(
+              (servico) => `
+                <option value="${escapeHtml(servico.id)}" ${servico.id === nota.servicoId ? 'selected' : ''}>
+                  ${escapeHtml(serviceOptionLabel(servico))}
+                </option>
+              `,
+            )
+            .join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label for="replacementDescricao">Descricao da nota substituta</label>
+        <textarea id="replacementDescricao" name="descricao" required>${escapeHtml(nota.descricao || '')}</textarea>
+      </div>
+      <div class="field">
+        <label for="replacementMotivo">Motivo da substituicao</label>
+        <textarea id="replacementMotivo" name="motivoSubstituicao" minlength="15" required>Correcao de dados da NFS-e emitida</textarea>
+      </div>
+      <div class="toolbar">
+        <button class="primary-btn" type="submit">Gerar substituicao</button>
+        <button class="ghost-btn" type="button" data-action="close-modal">Cancelar</button>
+      </div>
+    </form>
+  `;
+}
+
+function currencyInputValue(value?: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  }).format(Number(value || 0));
 }
 
 function renderEventsModal(events: NotaServicoEventoFiscal[]): string {

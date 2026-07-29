@@ -342,6 +342,11 @@ export function createMartirApp(root: HTMLDivElement) {
 
       if (form.id === 'fiscal-config-form') {
         await submitFiscalConfig(formData);
+        return;
+      }
+
+      if (form.id === 'replacement-form') {
+        await submitReplacement(formData);
       }
     } catch (error) {
       showToast(messageFromError(error) || 'Nao foi possivel concluir a operacao.', 'error');
@@ -867,47 +872,48 @@ export function createMartirApp(root: HTMLDivElement) {
       return;
     }
 
-    const valorServico = prompt('Valor da nota substituta:', String(note.valorServico));
-    if (!valorServico) {
-      return;
+    state.modal = {
+      type: 'replacement',
+      title: `Substituir NFS-e ${note.numeroNfse || note.numeroDps || ''}`.trim(),
+      data: note,
+    };
+    render();
+  }
+
+  async function submitReplacement(formData: FormData) {
+    const noteId = textField(formData, 'notaId');
+    const note = state.notas.find((item) => item.id === noteId);
+
+    if (!note) {
+      throw new Error('Nota original nao encontrada.');
     }
 
-    const descricao = prompt('Descricao da nota substituta:', note.descricao);
+    const descricao = textField(formData, 'descricao');
+    const servicoId = textField(formData, 'servicoId');
+    const motivoSubstituicao = textField(formData, 'motivoSubstituicao');
+
+    if (!servicoId) {
+      throw new Error('Escolha o servico da nota substituta.');
+    }
+
     if (!descricao) {
-      return;
-    }
-
-    const dataCompetencia = prompt(
-      'Data de competencia da nota substituta:',
-      toDateInputValue(note.dataCompetencia || note.dataEmissao || note.createdAt),
-    );
-    if (!dataCompetencia) {
-      return;
-    }
-
-    const motivoSubstituicao = prompt(
-      'Motivo da substituicao:',
-      'Correcao de dados da NFS-e emitida',
-    );
-    if (!motivoSubstituicao) {
-      return;
+      throw new Error('Informe a descricao da nota substituta.');
     }
 
     if (motivoSubstituicao.trim().length < 15) {
-      showToast('Motivo da substituicao precisa ter pelo menos 15 caracteres.', 'error');
-      return;
+      throw new Error('Motivo da substituicao precisa ter pelo menos 15 caracteres.');
     }
 
     const replacement = await replaceNfse(api, noteId, {
       clienteId: note.clienteId,
-      servicoId: note.servicoId,
-      valorServico: parseCurrencyValue(valorServico),
-      descricao: descricao.trim(),
+      servicoId,
+      valorServico: parseCurrencyField(formData, 'valorServico'),
+      descricao,
       serieDps: note.serieDps,
-      dataCompetencia,
+      dataCompetencia: toDateInputValue(note.dataCompetencia || note.dataEmissao || note.createdAt),
       codigoMunicipioPrestacao: note.codigoMunicipioPrestacao,
       codigoMotivoSubstituicao: '99',
-      motivoSubstituicao: motivoSubstituicao.trim(),
+      motivoSubstituicao,
     });
 
     await loadResources(api, state);
@@ -1030,6 +1036,7 @@ export function createMartirApp(root: HTMLDivElement) {
       'service-form': 'Salvando servico...',
       'fiscal-config-form': 'Salvando certificado...',
       'note-form': 'Emitindo nota...',
+      'replacement-form': 'Gerando substituicao...',
       'dashboard-range-form': 'Aplicando...',
       'search-form': 'Buscando...',
     };

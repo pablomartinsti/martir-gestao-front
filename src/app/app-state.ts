@@ -23,7 +23,7 @@ export interface ToastState {
 }
 
 export interface ModalState {
-  type: 'note' | 'text' | 'events' | 'readiness';
+  type: 'note' | 'text' | 'events' | 'readiness' | 'replacement';
   title?: string;
   data?: unknown;
 }
