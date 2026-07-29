@@ -1,8 +1,7 @@
 import type { AppState } from '../../app/app-state';
-import { formatDateOnly, formatDocument } from '../../shared/utils/formatters';
+import { formatDateOnly } from '../../shared/utils/formatters';
 
 export function renderCompanyView(state: AppState): string {
-  const empresa = state.empresa;
   const config = state.configuracaoFiscal;
   const canManageFiscal =
     state.usuario?.perfil === 'DONO' || state.usuario?.perfil === 'ADMIN';
@@ -18,9 +17,9 @@ export function renderCompanyView(state: AppState): string {
   return `
     <section class="section-head">
       <div>
-        <p class="eyebrow">Empresa</p>
-        <h1>${empresa?.razaoSocial || 'Empresa'}</h1>
-        <p>${formatDocument(empresa?.cnpj) || ''}</p>
+        <p class="eyebrow">NFS-e</p>
+        <h1>Certificado Digital</h1>
+        <p>Envie ou atualize o certificado A1 usado para emitir notas fiscais.</p>
       </div>
     </section>
     <div class="main-stack">
