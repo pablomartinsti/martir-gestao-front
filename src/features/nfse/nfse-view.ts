@@ -16,7 +16,7 @@ import {
   filterNotesByDashboardPeriod,
   getDashboardDateRange,
   getDashboardMovement,
-  serviceDetails,
+  serviceName,
 } from './nfse-selectors';
 
 export function renderDashboardView(state: AppState): string {
@@ -159,7 +159,7 @@ export function renderNotesTable(state: AppState, notas: NotaServico[], withTool
               <table>
                 <thead>
                   <tr>
-                    <th>N da Nota</th>
+                    <th>NFS-e</th>
                     <th>Emissao</th>
                     <th>Cliente</th>
                     <th>Servico</th>
@@ -192,10 +192,10 @@ export function renderMetaBox(label: string, value: string): string {
 function renderNoteRow(state: AppState, nota: NotaServico): string {
   return `
     <tr>
-      <td>${escapeHtml(nota.numeroNfse || nota.numeroDps || '-')}</td>
+      <td>${escapeHtml(nota.numeroNfse || '-')}</td>
       <td>${nota.dataEmissao ? formatDate(nota.dataEmissao) : '-'}</td>
       <td>${escapeHtml(clientName(state, nota.clienteId))}</td>
-      <td>${escapeHtml(serviceDetails(state, nota.servicoId))}</td>
+      <td>${escapeHtml(serviceName(state, nota.servicoId))}</td>
       <td>${formatCurrency(nota.valorServico)}</td>
       <td>${formatCurrency(nota.valorIss)}</td>
       <td><span class="status ${statusClass(nota.status)}">${statusLabel(nota.status)}</span></td>
