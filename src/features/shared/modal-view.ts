@@ -6,7 +6,7 @@ import type {
 } from '../../domain/models';
 import { escapeHtml } from '../../shared/utils/dom';
 import { formatCurrency, formatDate, readableEnum, statusLabel } from '../../shared/utils/formatters';
-import { clientName, serviceDetails } from '../nfse/nfse-selectors';
+import { clientName, serviceName } from '../nfse/nfse-selectors';
 import { renderMetaBox } from '../nfse/nfse-view';
 import { serviceOptionLabel } from '../services/service-labels';
 
@@ -60,19 +60,20 @@ function renderModalBody(state: AppState): string {
 }
 
 function renderNoteModal(state: AppState, nota: NotaServico): string {
+  const showFiscalNumber = nota.status !== 'RASCUNHO' && nota.numeroNfse;
+
   return `
     <div class="meta-grid">
       ${renderMetaBox('Status', statusLabel(nota.status))}
       ${renderMetaBox('Cliente', clientName(state, nota.clienteId))}
-      ${renderMetaBox('Valor', formatCurrency(nota.valorServico))}
+      ${renderMetaBox('Valor do servico', formatCurrency(nota.valorServico))}
       ${renderMetaBox('ISS', formatCurrency(nota.valorIss))}
-      ${renderMetaBox('Competencia', formatDate(nota.dataCompetencia || nota.createdAt))}
-      ${renderMetaBox('DPS', [nota.serieDps, nota.numeroDps].filter(Boolean).join(' / ') || '-')}
-      ${renderMetaBox('NFS-e', nota.numeroNfse || '-')}
-      ${renderMetaBox('Ambiente', readableEnum(nota.ambienteFiscal))}
+      ${showFiscalNumber ? renderMetaBox('NFS-e', nota.numeroNfse || '-') : ''}
     </div>
     <div class="modal-note-copy">
-      <strong>${escapeHtml(serviceDetails(state, nota.servicoId))}</strong>
+      <small>Servico</small>
+      <strong>${escapeHtml(serviceName(state, nota.servicoId))}</strong>
+      <small>Descricao</small>
       <span>${escapeHtml(nota.descricao || '-')}</span>
       ${nota.mensagemErroFiscal || nota.mensagemErro ? `<small>${escapeHtml(nota.mensagemErroFiscal || nota.mensagemErro || '')}</small>` : ''}
     </div>

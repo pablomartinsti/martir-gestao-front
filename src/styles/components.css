@@ -274,6 +274,10 @@
   line-height: 1.45;
 }
 
+.modal-note-copy small {
+  font-weight: 800;
+}
+
 .certificate-box {
   display: grid;
   gap: 12px;

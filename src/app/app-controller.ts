@@ -275,7 +275,7 @@ export function createMartirApp(root: HTMLDivElement) {
       if (note) {
         state.modal = {
           type: 'note',
-          title: `Nota ${note.numeroNfse || note.numeroDps || note.id}`,
+          title: note.status === 'RASCUNHO' ? 'Conferir rascunho' : `Nota ${note.numeroNfse || note.numeroDps || note.id}`,
           data: note,
         };
         render();
@@ -448,7 +448,7 @@ export function createMartirApp(root: HTMLDivElement) {
     state.view = 'notes';
     state.modal = {
       type: 'note',
-      title: `Rascunho DPS ${note.numeroDps || note.id}`,
+      title: 'Conferir rascunho',
       data: state.notas.find((item) => item.id === note.id) || note,
     };
     render();
@@ -907,7 +907,7 @@ export function createMartirApp(root: HTMLDivElement) {
     state.view = 'notes';
     state.modal = {
       type: 'note',
-      title: `Rascunho de substituicao DPS ${replacement.numeroDps || replacement.id}`,
+      title: 'Conferir rascunho de substituicao',
       data: state.notas.find((item) => item.id === replacement.id) || replacement,
     };
     render();
