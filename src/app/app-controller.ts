@@ -481,7 +481,7 @@ export function createMartirApp(root: HTMLDivElement) {
     const matches = findClientSearchMatches(term);
 
     if (!term) {
-      status.textContent = 'Digite e escolha um cliente cadastrado.';
+      status.textContent = '';
       status.dataset.status = '';
       return;
     }

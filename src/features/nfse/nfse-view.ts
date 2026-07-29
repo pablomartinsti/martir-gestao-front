@@ -93,7 +93,7 @@ export function renderNewNoteView(state: AppState): string {
             <datalist id="clientesOptions">
               ${activeClients.map((cliente) => `<option value="${escapeHtml(clientOptionLabel(cliente))}"></option>`).join('')}
             </datalist>
-            <small class="field-help" data-client-search-status>Digite e escolha um cliente cadastrado.</small>
+            <small class="field-help" data-client-search-status></small>
           </div>
           <div class="field">
             <label for="servicoId">Servico</label>
@@ -110,7 +110,7 @@ export function renderNewNoteView(state: AppState): string {
               id="valorServico"
               name="valorServico"
               inputmode="decimal"
-              placeholder="Ex.: 200,00"
+              placeholder="Ex.: 200 ou 200,00"
               required
             />
           </div>
