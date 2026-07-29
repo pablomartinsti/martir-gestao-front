@@ -5,7 +5,8 @@ import { renderMetaBox } from '../nfse/nfse-view';
 export function renderCompanyView(state: AppState): string {
   const empresa = state.empresa;
   const config = state.configuracaoFiscal;
-  const canEditFiscal = state.usuario?.perfil === 'DONO';
+  const canManageFiscal =
+    state.usuario?.perfil === 'DONO' || state.usuario?.perfil === 'ADMIN';
   const certificateConfigured =
     Boolean(config?.certificadoA1Configurado) || config?.certificadoA1SenhaConfigurada;
   const certificateLabel = certificateConfigured ? 'Configurado' : 'Nao configurado';
@@ -29,20 +30,23 @@ export function renderCompanyView(state: AppState): string {
         ${renderMetaBox('Regime tributario', readableEnum(empresa?.regimeTributario))}
         ${renderMetaBox('Ambiente fiscal', readableEnum(config?.ambienteFiscalPadrao || 'HOMOLOGACAO'))}
       </section>
+      ${
+        canManageFiscal
+          ? `
       <section class="form-panel">
         <div class="panel-title"><h2>Configuracao fiscal</h2></div>
         <form id="fiscal-config-form" class="form-grid">
           <div class="form-grid two">
             <div class="field">
               <label for="ambienteFiscalPadrao">Ambiente fiscal padrao</label>
-              <select id="ambienteFiscalPadrao" name="ambienteFiscalPadrao" ${canEditFiscal ? '' : 'disabled'}>
+              <select id="ambienteFiscalPadrao" name="ambienteFiscalPadrao">
                 <option value="HOMOLOGACAO" ${config?.ambienteFiscalPadrao === 'HOMOLOGACAO' ? 'selected' : ''}>Homologacao</option>
                 <option value="PRODUCAO" ${config?.ambienteFiscalPadrao === 'PRODUCAO' ? 'selected' : ''}>Producao</option>
               </select>
             </div>
             <div class="field">
               <label for="serieDpsPadrao">Serie DPS padrao</label>
-              <input id="serieDpsPadrao" name="serieDpsPadrao" value="${config?.serieDpsPadrao || '1'}" ${canEditFiscal ? '' : 'disabled'} />
+              <input id="serieDpsPadrao" name="serieDpsPadrao" value="${config?.serieDpsPadrao || '1'}" />
             </div>
           </div>
           <div class="certificate-box">
@@ -51,7 +55,7 @@ export function renderCompanyView(state: AppState): string {
               <div class="certificate-actions">
                 <span class="status ${certificateConfigured ? 'emitida' : 'rascunho'}">${certificateLabel}</span>
                 ${
-                  certificateConfigured && canEditFiscal
+                  certificateConfigured
                     ? '<button class="danger-btn compact" type="button" data-action="remove-certificate-a1">Remover certificado</button>'
                     : ''
                 }
@@ -61,21 +65,24 @@ export function renderCompanyView(state: AppState): string {
             <div class="form-grid two">
               <div class="field">
                 <label for="certificadoA1Arquivo">Arquivo</label>
-                <input id="certificadoA1Arquivo" name="certificadoA1Arquivo" type="file" accept=".pfx,.p12" ${canEditFiscal ? '' : 'disabled'} />
+                <input id="certificadoA1Arquivo" name="certificadoA1Arquivo" type="file" accept=".pfx,.p12" />
               </div>
               <div class="field">
                 <label for="certificadoA1Senha">Senha do certificado</label>
                 <div class="password-control">
-                  <input id="certificadoA1Senha" name="certificadoA1Senha" type="password" autocomplete="off" ${canEditFiscal ? '' : 'disabled'} />
-                  <button class="action-btn password-toggle" type="button" data-action="toggle-password" data-target="certificadoA1Senha" ${canEditFiscal ? '' : 'disabled'} aria-label="Mostrar senha" title="Mostrar senha">Ver</button>
+                  <input id="certificadoA1Senha" name="certificadoA1Senha" type="password" autocomplete="off" />
+                  <button class="action-btn password-toggle" type="button" data-action="toggle-password" data-target="certificadoA1Senha" aria-label="Mostrar senha" title="Mostrar senha">Ver</button>
                 </div>
               </div>
             </div>
             <small class="field-help">Use arquivo A1 .pfx ou .p12.</small>
           </div>
-          <button class="primary-btn" type="submit" ${canEditFiscal ? '' : 'disabled'}>Salvar configuracao</button>
+          <button class="primary-btn" type="submit">Salvar configuracao</button>
         </form>
       </section>
+          `
+          : ''
+      }
     </div>
   `;
 }

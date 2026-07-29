@@ -19,6 +19,10 @@ export function renderAppShell(state: AppState, content: string): string {
 
 export function renderSidebar(state: AppState): string {
   const empresa = state.empresa;
+  const canManageSettings = canManageCompanySettings(state);
+  const visibleNavItems = navItems.filter(
+    (item) => canManageSettings || !['company', 'users'].includes(item.view),
+  );
 
   return `
     <aside class="sidebar">
@@ -27,7 +31,7 @@ export function renderSidebar(state: AppState): string {
       </div>
       <div class="sidebar-section-title">Modulo NFS-e</div>
       <nav class="side-nav" aria-label="Navegacao principal">
-        ${navItems
+        ${visibleNavItems
           .map(
             (item) => `
               <button class="nav-item ${state.view === item.view ? 'active' : ''}" data-action="switch-view" data-view="${item.view}">
@@ -51,6 +55,11 @@ export function renderSidebar(state: AppState): string {
 
 export function renderTopbar(state: AppState): string {
   const empresaNome = state.empresa?.razaoSocial || state.empresa?.nomeFantasia || 'Empresa ativa';
+  const canManageSettings = canManageCompanySettings(state);
+  const companyPickerContent = `
+    <span>Empresa ativa</span>
+    <strong>${escapeHtml(empresaNome)}</strong>
+  `;
 
   return `
     <header class="topbar">
@@ -59,10 +68,11 @@ export function renderTopbar(state: AppState): string {
         <span>Martir Gestao</span>
       </div>
       <div class="topbar-center">
-        <button class="company-picker" data-action="switch-view" data-view="company">
-          <span>Empresa ativa</span>
-          <strong>${escapeHtml(empresaNome)}</strong>
-        </button>
+        ${
+          canManageSettings
+            ? `<button class="company-picker" data-action="switch-view" data-view="company">${companyPickerContent}</button>`
+            : `<div class="company-picker readonly">${companyPickerContent}</div>`
+        }
       </div>
       <div class="topbar-actions">
         <span class="avatar">${getInitials(state.usuario?.nome || state.usuario?.email || 'MC')}</span>
@@ -74,4 +84,8 @@ export function renderTopbar(state: AppState): string {
 
 export function renderLoading(): string {
   return '<section class="empty">Carregando dados da API...</section>';
+}
+
+function canManageCompanySettings(state: AppState): boolean {
+  return state.usuario?.perfil === 'DONO' || state.usuario?.perfil === 'ADMIN';
 }

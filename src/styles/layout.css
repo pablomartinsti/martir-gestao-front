@@ -148,6 +148,10 @@
   text-align: left;
 }
 
+.company-picker.readonly {
+  cursor: default;
+}
+
 .company-picker span {
   color: var(--ink-500);
   font-size: 0.72rem;
