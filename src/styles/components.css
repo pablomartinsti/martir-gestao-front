@@ -246,6 +246,11 @@
   margin-bottom: 0;
 }
 
+.certificate-expiry {
+  color: var(--ink-900);
+  font-size: 0.9rem;
+}
+
 .compact-empty {
   min-height: 70px;
 }

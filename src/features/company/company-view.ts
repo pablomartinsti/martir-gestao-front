@@ -1,5 +1,5 @@
 import type { AppState } from '../../app/app-state';
-import { formatDocument, readableEnum } from '../../shared/utils/formatters';
+import { formatDateOnly, formatDocument, readableEnum } from '../../shared/utils/formatters';
 import { renderMetaBox } from '../nfse/nfse-view';
 
 export function renderCompanyView(state: AppState): string {
@@ -8,9 +8,12 @@ export function renderCompanyView(state: AppState): string {
   const canEditFiscal = state.usuario?.perfil === 'DONO';
   const certificateConfigured =
     Boolean(config?.certificadoA1Configurado) || config?.certificadoA1SenhaConfigurada;
-  const certificateLabel = certificateConfigured
-    ? config?.certificadoA1NomeArquivo || 'Configurado'
-    : 'Nao configurado';
+  const certificateLabel = certificateConfigured ? 'Configurado' : 'Nao configurado';
+  const certificateExpiry = certificateConfigured
+    ? config?.certificadoA1ValidoAte
+      ? `Vence em ${formatDateOnly(config.certificadoA1ValidoAte)}`
+      : 'Validade nao informada'
+    : 'Envie o certificado A1 para emitir em producao.';
 
   return `
     <section class="section-head">
@@ -47,6 +50,7 @@ export function renderCompanyView(state: AppState): string {
               <h3>Certificado A1</h3>
               <span class="status ${certificateConfigured ? 'emitida' : 'rascunho'}">${certificateLabel}</span>
             </div>
+            <strong class="certificate-expiry">${certificateExpiry}</strong>
             <div class="form-grid two">
               <div class="field">
                 <label for="certificadoA1Arquivo">Arquivo</label>

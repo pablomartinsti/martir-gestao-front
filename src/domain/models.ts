@@ -51,6 +51,7 @@ export interface ConfiguracaoFiscalEmpresa {
   certificadoA1Path?: string;
   certificadoA1NomeArquivo?: string;
   certificadoA1Configurado?: boolean;
+  certificadoA1ValidoAte?: string;
   certificadoA1SenhaConfigurada: boolean;
   ativo: boolean;
   createdAt?: string;
