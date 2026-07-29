@@ -1,5 +1,4 @@
 import { useMemo, useState, type FormEvent } from 'react';
-import styled from 'styled-components';
 
 import type { AppDataState } from '../../types/app';
 import type { Cliente } from '../../types/models';
@@ -7,6 +6,7 @@ import { formatDocument } from '../../utils/formatters';
 import { normalizeSearchText, onlyNumbers, todayInputValue } from '../../utils/forms';
 import { serviceOptionLabel } from '../../utils/serviceLabels';
 import { Button, Eyebrow, Field, FieldHelp, FormGrid, Grid, Panel, SectionHead } from '../../components/ui';
+import { ClientField } from './styles';
 
 interface NewNotePageProps {
   state: AppDataState;
@@ -140,7 +140,3 @@ function findClientMatches(clients: Cliente[], value: string): Cliente[] {
 function clientOptionLabel(cliente: Cliente): string {
   return `${cliente.nomeRazaoSocial} | ${formatDocument(cliente.cpfCnpj)}`;
 }
-
-const ClientField = styled(Field)`
-  min-width: 0;
-`;

@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from 'react';
-import styled from 'styled-components';
 
 import type { AppDataState, AppView } from '../../types/app';
 import type { NotaServico } from '../../types/models';
@@ -7,6 +6,7 @@ import { formatCurrency, formatDate, statusLabel } from '../../utils/formatters'
 import { clientName, serviceName } from '../../utils/nfseSelectors';
 import { canDownloadDanfse } from '../NoteActions';
 import { Button, Empty, Panel, PanelTitle, StatusBadge, Toolbar } from '../ui';
+import { Actions, Muted, SearchBox, TableScroll } from './styles';
 
 interface NotesTableProps {
   state: AppDataState;
@@ -183,62 +183,3 @@ export function NotesTable({
 function actionKey(label: string, note: NotaServico): string {
   return `${label}:${note.id}`;
 }
-
-const SearchBox = styled.label`
-  display: flex;
-  min-width: min(420px, 100%);
-  flex: 1;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid var(--line-strong);
-  border-radius: 6px;
-  background: #ffffff;
-  padding: 0 12px;
-
-  input {
-    min-height: 40px;
-    flex: 1;
-    border: 0;
-    outline: 0;
-  }
-`;
-
-const TableScroll = styled.div`
-  overflow-x: auto;
-
-  table {
-    width: 100%;
-    min-width: 860px;
-    border-collapse: collapse;
-  }
-
-  th,
-  td {
-    border-bottom: 1px solid var(--line);
-    padding: 12px 10px;
-    text-align: left;
-    vertical-align: middle;
-  }
-
-  th {
-    color: var(--ink-700);
-    font-size: 0.78rem;
-    font-weight: 900;
-  }
-
-  td {
-    color: var(--ink-700);
-    font-size: 0.88rem;
-  }
-`;
-
-const Actions = styled.div`
-  display: flex;
-  gap: 6px;
-  justify-content: flex-end;
-`;
-
-const Muted = styled.span`
-  color: var(--ink-500);
-  font-weight: 800;
-`;

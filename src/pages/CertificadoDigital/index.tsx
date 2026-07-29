@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from 'react';
-import styled from 'styled-components';
 
 import type { AppDataState } from '../../types/app';
 import { formatDateOnly } from '../../utils/formatters';
 import { PasswordToggle } from '../../components/PasswordToggle';
 import { Button, Eyebrow, Field, FormGrid, Grid, Panel, PanelTitle, SectionHead, StatusBadge } from '../../components/ui';
+import { CertificateActions, CertificateBox, Expiry, Hint, PasswordRow } from './styles';
 
 interface CertificatePageProps {
   state: AppDataState;
@@ -97,34 +97,3 @@ export function CertificatePage({ state, onSubmit, onRemoveCertificate }: Certif
     </>
   );
 }
-
-const CertificateBox = styled.div`
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface-soft);
-  padding: 16px;
-`;
-
-const CertificateActions = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-`;
-
-const Expiry = styled.strong`
-  display: block;
-  margin-bottom: 14px;
-`;
-
-const PasswordRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px;
-`;
-
-const Hint = styled.small`
-  display: block;
-  margin-top: 10px;
-  color: var(--ink-500);
-  font-weight: 800;
-`;

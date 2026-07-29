@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from 'react';
-import styled from 'styled-components';
 
 import type { AppDataState, AppModal } from '../../types/app';
 import type { NotaServico } from '../../types/models';
@@ -10,6 +9,7 @@ import { serviceOptionLabel } from '../../utils/serviceLabels';
 import { canDownloadDanfse } from '../NoteActions';
 import { MetaBox, MetaGrid } from '../MetaBox';
 import { Button, Empty, Field, FormGrid, PanelTitle } from '../ui';
+import { ActionRow, Backdrop, Body, DetailsStack, Dialog, ErrorMessage, Head, NoteCopy } from './styles';
 
 interface ModalProps {
   modal: AppModal;
@@ -249,68 +249,3 @@ function BusyButton({
     </Button>
   );
 }
-
-const Backdrop = styled.div`
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  display: grid;
-  place-items: center;
-  background: rgba(7, 8, 43, 0.58);
-  padding: 20px;
-`;
-
-const Dialog = styled.article`
-  width: min(980px, 100%);
-  max-height: min(92vh, 820px);
-  overflow: auto;
-  border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: var(--shadow);
-`;
-
-const Head = styled.header`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  border-bottom: 1px solid var(--line);
-  padding: 20px;
-
-  h2 {
-    margin: 0;
-  }
-`;
-
-const Body = styled.div`
-  padding: 20px;
-`;
-
-const DetailsStack = styled.div`
-  display: grid;
-  gap: 16px;
-`;
-
-const NoteCopy = styled.div`
-  display: grid;
-  gap: 6px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface-soft);
-  padding: 16px;
-
-  small {
-    color: var(--ink-500);
-    font-weight: 900;
-  }
-`;
-
-const ErrorMessage = styled.small`
-  color: var(--red-600);
-`;
-
-const ActionRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-`;

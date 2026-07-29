@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import styled from 'styled-components';
 
 import { fetchAddressByCep } from '../../services/cepApi';
 import { fetchCompanyByCnpj } from '../../services/cnpjApi';
@@ -21,6 +20,7 @@ import {
   SectionHead,
   StatusBadge,
 } from '../../components/ui';
+import { Actions, InlineActions } from './styles';
 
 interface ClientsPageProps {
   state: AppDataState;
@@ -314,16 +314,3 @@ function statusTone(value: string): 'success' | 'error' | '' {
 function messageFromError(error: unknown): string {
   return error instanceof Error ? error.message : 'Erro inesperado.';
 }
-
-const InlineActions = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-`;
-
-const Actions = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-`;

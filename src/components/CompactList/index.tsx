@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import styled from 'styled-components';
 
 import { Empty } from '../ui';
+import { Actions, Copy, Item, List } from './styles';
 
 interface CompactListProps<T> {
   items: T[];
@@ -37,48 +37,3 @@ function itemKey(item: unknown, index: number): string {
 
   return String(index);
 }
-
-const List = styled.div`
-  display: grid;
-  gap: 10px;
-`;
-
-const Item = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface);
-  padding: 12px;
-
-  @media (max-width: 820px) {
-    align-items: stretch;
-    flex-direction: column;
-  }
-`;
-
-const Copy = styled.div`
-  display: grid;
-  min-width: 0;
-  gap: 4px;
-
-  strong {
-    color: var(--ink-900);
-  }
-
-  span {
-    color: var(--ink-500);
-    font-size: 0.84rem;
-  }
-`;
-
-const Actions = styled.div`
-  flex: 0 0 auto;
-
-  @media (max-width: 820px) {
-    display: flex;
-    justify-content: flex-start;
-  }
-`;
