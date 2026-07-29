@@ -535,6 +535,11 @@ td {
   justify-content: flex-end;
 }
 
+.muted-action {
+  color: var(--ink-500);
+  font-weight: 800;
+}
+
 .empty {
   display: grid;
   min-height: 180px;

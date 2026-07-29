@@ -164,7 +164,6 @@ export function renderNotesTable(state: AppState, notas: NotaServico[], withTool
                     <th>Cliente</th>
                     <th>Servico</th>
                     <th>Valor</th>
-                    <th>ISS</th>
                     <th>Status</th>
                     <th>Acoes</th>
                   </tr>
@@ -197,7 +196,6 @@ function renderNoteRow(state: AppState, nota: NotaServico): string {
       <td>${escapeHtml(clientName(state, nota.clienteId))}</td>
       <td>${escapeHtml(serviceName(state, nota.servicoId))}</td>
       <td>${formatCurrency(nota.valorServico)}</td>
-      <td>${formatCurrency(nota.valorIss)}</td>
       <td><span class="status ${statusClass(nota.status)}">${statusLabel(nota.status)}</span></td>
       <td>
         ${renderNoteActions(nota)}
@@ -207,11 +205,10 @@ function renderNoteRow(state: AppState, nota: NotaServico): string {
 }
 
 function renderNoteActions(nota: NotaServico): string {
-  const actions = [
-    `<button class="action-btn" data-action="show-note" data-id="${nota.id}">Ver</button>`,
-  ];
+  const actions: string[] = [];
 
   if (nota.status === 'RASCUNHO') {
+    actions.push(`<button class="action-btn" data-action="show-note" data-id="${nota.id}">Ver</button>`);
     actions.push(`<button class="primary-btn compact" data-action="emit-note" data-id="${nota.id}">Emitir NFS-e</button>`);
     actions.push(`<button class="danger-btn compact" data-action="delete-draft-note" data-id="${nota.id}">Excluir</button>`);
   }
@@ -225,7 +222,7 @@ function renderNoteActions(nota: NotaServico): string {
     actions.push(`<button class="danger-btn compact" data-action="cancel-nfse" data-id="${nota.id}">Cancelar</button>`);
   }
 
-  return `<div class="table-actions">${actions.join('')}</div>`;
+  return `<div class="table-actions">${actions.length ? actions.join('') : '<span class="muted-action">-</span>'}</div>`;
 }
 
 function renderDashboardPeriodFilter(state: AppState, notesCount: number): string {
