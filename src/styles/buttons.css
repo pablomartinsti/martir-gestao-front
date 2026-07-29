@@ -74,3 +74,20 @@
 .action-btn:hover {
   transform: translateY(-1px);
 }
+
+.primary-btn:disabled,
+.secondary-btn:disabled,
+.ghost-btn:disabled,
+.danger-btn:disabled,
+.icon-btn:disabled,
+.action-btn:disabled,
+.primary-btn.is-loading,
+.secondary-btn.is-loading,
+.ghost-btn.is-loading,
+.danger-btn.is-loading,
+.icon-btn.is-loading,
+.action-btn.is-loading {
+  cursor: wait;
+  opacity: 0.68;
+  transform: none;
+}

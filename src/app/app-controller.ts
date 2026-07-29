@@ -35,6 +35,12 @@ type GoogleCredentialResponse = {
   credential?: string;
 };
 
+type ButtonBusyState = {
+  button: HTMLButtonElement;
+  text: string;
+  disabled: boolean;
+};
+
 declare global {
   interface Window {
     google?: {
@@ -68,7 +74,16 @@ export function createMartirApp(root: HTMLDivElement) {
     }
 
     event.preventDefault();
-    void handleAction(button);
+
+    const busyState = startActionSubmitting(button);
+
+    void handleAction(button)
+      .catch((error) => {
+        showToast(messageFromError(error) || 'Nao foi possivel concluir a operacao.', 'error');
+      })
+      .finally(() => {
+        stopButtonSubmitting(busyState);
+      });
   });
 
   root.addEventListener('submit', (event) => {
@@ -286,6 +301,7 @@ export function createMartirApp(root: HTMLDivElement) {
 
   async function handleSubmit(form: HTMLFormElement) {
     const formData = new FormData(form);
+    const submitState = startFormSubmitting(form);
 
     try {
       if (form.id === 'login-form') {
@@ -329,6 +345,8 @@ export function createMartirApp(root: HTMLDivElement) {
       }
     } catch (error) {
       showToast(messageFromError(error) || 'Nao foi possivel concluir a operacao.', 'error');
+    } finally {
+      stopFormSubmitting(form, submitState);
     }
   }
 
@@ -429,9 +447,7 @@ export function createMartirApp(root: HTMLDivElement) {
       const readiness = await getReadiness(api, noteId);
 
       if (!readiness.pronto) {
-        throw new Error(
-          `Pendencias fiscais: ${readiness.pendencias.join(', ') || 'revise a nota'}`,
-        );
+        throw new Error(`Pendencias fiscais: ${formatFiscalPendencies(readiness.pendencias)}`);
       }
 
       await sendDps(api, noteId);
@@ -812,7 +828,7 @@ export function createMartirApp(root: HTMLDivElement) {
         const readiness = await getReadiness(api, noteId);
 
         if (!readiness.pronto) {
-          throw new Error(`Pendencias fiscais: ${readiness.pendencias.join(', ') || 'revise a nota'}`);
+          throw new Error(`Pendencias fiscais: ${formatFiscalPendencies(readiness.pendencias)}`);
         }
 
         return sendDps(api, noteId);
@@ -948,6 +964,108 @@ export function createMartirApp(root: HTMLDivElement) {
 
   function messageFromError(error: unknown): string {
     return error instanceof Error ? error.message : 'Erro inesperado.';
+  }
+
+  function startFormSubmitting(form: HTMLFormElement): ButtonBusyState | null {
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+
+    if (!button) {
+      return null;
+    }
+
+    const stateBeforeSubmit = {
+      button,
+      text: button.textContent || '',
+      disabled: button.disabled,
+    };
+
+    button.disabled = true;
+    button.classList.add('is-loading');
+    button.textContent = submitLoadingLabel(form.id, stateBeforeSubmit.text);
+    form.setAttribute('aria-busy', 'true');
+
+    return stateBeforeSubmit;
+  }
+
+  function stopFormSubmitting(form: HTMLFormElement, submitState: ButtonBusyState | null) {
+    form.removeAttribute('aria-busy');
+    stopButtonSubmitting(submitState);
+  }
+
+  function startActionSubmitting(button: HTMLButtonElement): ButtonBusyState | null {
+    const label = actionLoadingLabel(button.dataset.action || '');
+
+    if (!label) {
+      return null;
+    }
+
+    const stateBeforeSubmit = {
+      button,
+      text: button.textContent || '',
+      disabled: button.disabled,
+    };
+
+    button.disabled = true;
+    button.classList.add('is-loading');
+    button.textContent = label;
+
+    return stateBeforeSubmit;
+  }
+
+  function stopButtonSubmitting(submitState: ButtonBusyState | null) {
+    if (!submitState?.button.isConnected) {
+      return;
+    }
+
+    submitState.button.disabled = submitState.disabled;
+    submitState.button.classList.remove('is-loading');
+    submitState.button.textContent = submitState.text;
+  }
+
+  function submitLoadingLabel(formId: string, fallback: string) {
+    const labels: Record<string, string> = {
+      'login-form': 'Entrando...',
+      'onboarding-form': 'Criando cadastro...',
+      'client-form': 'Salvando cliente...',
+      'service-form': 'Salvando servico...',
+      'fiscal-config-form': 'Salvando certificado...',
+      'note-form': 'Emitindo nota...',
+      'dashboard-range-form': 'Aplicando...',
+      'search-form': 'Buscando...',
+    };
+
+    return labels[formId] || fallback || 'Aguarde...';
+  }
+
+  function actionLoadingLabel(action: string) {
+    const labels: Record<string, string> = {
+      refresh: 'Atualizando...',
+      'remove-certificate-a1': 'Removendo...',
+      'service-status': 'Salvando...',
+      'client-fetch-cnpj': 'Buscando...',
+      'emit-note': 'Emitindo...',
+      'cancel-nfse': 'Cancelando...',
+      'replace-nfse': 'Preparando...',
+    };
+
+    return labels[action] || '';
+  }
+
+  function formatFiscalPendencies(pendencies: string[]) {
+    if (!pendencies.length) {
+      return 'revise os dados da nota';
+    }
+
+    const labels: Record<string, string> = {
+      'producaoReal.permissao': 'emissao em producao ainda nao liberada na API',
+      'producaoReal.regimeTributario': 'regime tributario ainda nao suportado para emissao real',
+      'producaoReal.urlSefinProducao': 'URL de producao da prefeitura nao configurada',
+      'producaoReal.xsdDps': 'arquivo XSD da DPS nao configurado na API',
+      'producaoReal.xsdEvento': 'arquivo XSD de eventos nao configurado na API',
+      'producaoReal.certificadoA1Empresa': 'certificado digital A1 da empresa nao configurado',
+    };
+
+    return pendencies.map((pendency) => labels[pendency] || pendency).join(', ');
   }
 
   function togglePasswordVisibility(button: HTMLButtonElement) {
