@@ -77,8 +77,8 @@ export function renderNewNoteView(state: AppState): string {
       <form id="note-form" class="form-grid">
         <input type="hidden" name="serieDps" value="${escapeHtml(serieDps)}" />
         <input type="hidden" name="codigoMunicipioPrestacao" value="${escapeHtml(codigoMunicipioPrestacao)}" />
-        <div class="form-grid two">
-          <div class="field">
+        <div class="form-grid two note-main-row">
+          <div class="field note-client-field">
             <label for="clienteBusca">Cliente</label>
             <input id="clienteId" name="clienteId" type="hidden" />
             <input
@@ -93,7 +93,7 @@ export function renderNewNoteView(state: AppState): string {
             <datalist id="clientesOptions">
               ${activeClients.map((cliente) => `<option value="${escapeHtml(clientOptionLabel(cliente))}"></option>`).join('')}
             </datalist>
-            <small class="field-help" data-client-search-status></small>
+            <small class="field-help note-client-help" data-client-search-status></small>
           </div>
           <div class="field">
             <label for="servicoId">Servico</label>
@@ -115,7 +115,7 @@ export function renderNewNoteView(state: AppState): string {
             />
           </div>
           <div class="field">
-            <label for="dataCompetencia">Data de competencia</label>
+            <label for="dataCompetencia">Competencia do servico</label>
             <input id="dataCompetencia" name="dataCompetencia" type="date" value="${todayInputValue()}" required />
           </div>
         </div>
