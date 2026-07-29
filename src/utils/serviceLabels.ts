@@ -6,7 +6,7 @@ export function shortServiceId(servico: Servico): string {
 }
 
 export function serviceTitle(servico: Servico): string {
-  return servico.descricao || 'Servico sem descricao';
+  return servico.descricao || 'Serviço sem descrição';
 }
 
 export function serviceFiscalSummary(servico: Servico): string {

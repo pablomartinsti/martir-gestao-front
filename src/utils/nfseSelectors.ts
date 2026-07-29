@@ -1,4 +1,4 @@
-import type { AppState } from '../app/app-state';
+import type { AppDataState } from '../types/app';
 import type { NotaServico } from '../types/models';
 import { serviceOptionLabel, serviceTitle } from './serviceLabels';
 
@@ -23,24 +23,28 @@ export interface DashboardMovement {
   totalIss: number;
 }
 
-export function clientName(state: AppState, id?: string): string {
+export function clientName(state: AppDataState, id?: string): string {
   return state.clientes.find((cliente) => cliente.id === id)?.nomeRazaoSocial || id || '-';
 }
 
-export function serviceName(state: AppState, id?: string): string {
+export function serviceName(state: AppDataState, id?: string): string {
   const servico = state.servicos.find((item) => item.id === id);
 
   return servico ? serviceTitle(servico) : id || '-';
 }
 
-export function serviceDetails(state: AppState, id?: string): string {
+export function serviceDetails(state: AppDataState, id?: string): string {
   const servico = state.servicos.find((item) => item.id === id);
 
   return servico ? serviceOptionLabel(servico) : id || '-';
 }
 
-export function filterNotes(state: AppState, notas: NotaServico[]): NotaServico[] {
-  const term = state.search.toLowerCase();
+export function filterNotes(
+  state: AppDataState,
+  notas: NotaServico[],
+  search: string,
+): NotaServico[] {
+  const term = search.toLowerCase();
 
   if (!term) {
     return notas;
@@ -65,7 +69,7 @@ export function filterNotes(state: AppState, notas: NotaServico[]): NotaServico[
   });
 }
 
-export function getSummary(state: AppState, notas = state.notas) {
+export function getSummary(notas: NotaServico[]) {
   return {
     total: notas.length,
     emitidas: notas.filter((nota) => nota.status === 'EMITIDA').length,
@@ -76,11 +80,14 @@ export function getSummary(state: AppState, notas = state.notas) {
   };
 }
 
-export function getDashboardDateRange(state: AppState): DashboardDateRange {
-  if (state.dashboardStartDate && state.dashboardEndDate) {
+export function getDashboardDateRange(
+  dashboardStartDate: string,
+  dashboardEndDate: string,
+): DashboardDateRange {
+  if (dashboardStartDate && dashboardEndDate) {
     return {
-      start: state.dashboardStartDate,
-      end: state.dashboardEndDate,
+      start: dashboardStartDate,
+      end: dashboardEndDate,
     };
   }
 
@@ -94,8 +101,11 @@ export function getDashboardDateRange(state: AppState): DashboardDateRange {
   };
 }
 
-export function filterNotesByDashboardPeriod(state: AppState): NotaServico[] {
-  return filterNotesByDateRange(state.notas, getDashboardDateRange(state));
+export function filterNotesByDashboardPeriod(
+  notas: NotaServico[],
+  range: DashboardDateRange,
+): NotaServico[] {
+  return filterNotesByDateRange(notas, range);
 }
 
 export function filterNotesByDateRange(notas: NotaServico[], range: DashboardDateRange): NotaServico[] {
@@ -115,8 +125,10 @@ export function filterNotesByDateRange(notas: NotaServico[], range: DashboardDat
   });
 }
 
-export function getDashboardMovement(state: AppState, notas = state.notas): DashboardMovement {
-  const range = getDashboardDateRange(state);
+export function getDashboardMovement(
+  notas: NotaServico[],
+  range: DashboardDateRange,
+): DashboardMovement {
   const start = parseDateInput(range.start);
   const end = parseDateInput(range.end);
   const emittedNotes = notas.filter((nota) => nota.status === 'EMITIDA');

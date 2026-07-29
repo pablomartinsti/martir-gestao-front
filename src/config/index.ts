@@ -1,19 +1,6 @@
-const LOCAL_API_URL = 'http://localhost:3333';
 const PRODUCTION_API_URL = 'https://nota-fiscal.martircontabil.com.br';
 
-function resolverDefaultApiUrl(): string {
-  if (window.location.hostname === 'localhost') {
-    return LOCAL_API_URL;
-  }
-
-  if (window.location.hostname === '127.0.0.1') {
-    return LOCAL_API_URL;
-  }
-
-  return PRODUCTION_API_URL;
-}
-
-export const DEFAULT_API_URL = resolverDefaultApiUrl();
+export const DEFAULT_API_URL = import.meta.env.VITE_API_URL || PRODUCTION_API_URL;
 export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
 export const STORAGE_KEYS = {
