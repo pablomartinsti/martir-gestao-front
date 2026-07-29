@@ -264,13 +264,35 @@ function formatDateOnly(value: string): string {
 }
 
 function renderKpis(notas: NotaServico[]): string {
-  const emitidas = notas.filter((nota) => nota.status === 'EMITIDA');
-  const faturamento = emitidas.reduce((total, nota) => total + Number(nota.valorServico || 0), 0);
-  const iss = emitidas.reduce((total, nota) => total + Number(nota.valorIss || 0), 0);
   const cards = [
-    { label: 'Notas emitidas', value: formatNumber(emitidas.length), hint: 'no periodo', tone: 'green', symbol: 'NF' },
-    { label: 'Faturamento', value: formatCurrency(faturamento), hint: 'notas emitidas', tone: 'amber', symbol: 'R$' },
-    { label: 'ISS', value: formatCurrency(iss), hint: 'calculado nas notas', tone: '', symbol: 'IS' },
+    {
+      label: 'Emitidas',
+      value: notas.filter((nota) => nota.status === 'EMITIDA').length,
+      hint: 'notas autorizadas',
+      tone: 'green',
+      symbol: 'EM',
+    },
+    {
+      label: 'Canceladas',
+      value: notas.filter((nota) => nota.status === 'CANCELADA').length,
+      hint: 'notas canceladas',
+      tone: 'gray',
+      symbol: 'CA',
+    },
+    {
+      label: 'Substituidas',
+      value: notas.filter((nota) => nota.status === 'SUBSTITUIDA').length,
+      hint: 'notas substituidas',
+      tone: 'amber',
+      symbol: 'SU',
+    },
+    {
+      label: 'Erros',
+      value: notas.filter((nota) => nota.status === 'ERRO').length,
+      hint: 'precisam de atencao',
+      tone: 'red',
+      symbol: 'ER',
+    },
   ];
 
   return `
@@ -282,7 +304,7 @@ function renderKpis(notas: NotaServico[]): string {
               <span class="kpi-symbol ${card.tone}">${card.symbol}</span>
               <div>
                 <span>${card.label}</span>
-                <strong>${card.value}</strong>
+                <strong>${formatNumber(card.value)}</strong>
                 <small>${card.hint}</small>
               </div>
             </article>
