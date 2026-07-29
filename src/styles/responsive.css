@@ -69,7 +69,8 @@
 
   .kpi-grid,
   .meta-grid,
-  .form-grid.two {
+  .form-grid.two,
+  .form-grid.three {
     grid-template-columns: 1fr;
   }
 }

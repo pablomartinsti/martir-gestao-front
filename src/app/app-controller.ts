@@ -1,4 +1,4 @@
-import { login } from '../features/auth/auth-api';
+import { login, loginWithGoogle, onboard } from '../features/auth/auth-api';
 import { renderAuth } from '../features/auth/auth-view';
 import type { Cliente } from '../domain/models';
 import { fetchAddressByCep } from '../features/clients/cep-api';
@@ -24,12 +24,34 @@ import { createService, updateServiceStatus } from '../features/services/service
 import { renderServicesView } from '../features/services/services-view';
 import { renderModal } from '../features/shared/modal-view';
 import { renderToast } from '../features/shared/toast-view';
-import { DEFAULT_API_URL, STORAGE_KEYS } from '../shared/config';
+import { DEFAULT_API_URL, GOOGLE_CLIENT_ID, STORAGE_KEYS } from '../shared/config';
 import { createApiClient } from '../shared/api/http-client';
 import { compactBody } from '../shared/utils/dom';
 import { formatDocument } from '../shared/utils/formatters';
 import { createInitialState, type AppView, type ToastState } from './app-state';
 import { loadAuthenticatedProfile, loadResources } from './resource-loader';
+
+type GoogleCredentialResponse = {
+  credential?: string;
+};
+
+declare global {
+  interface Window {
+    google?: {
+      accounts?: {
+        id?: {
+          initialize: (config: {
+            client_id: string;
+            callback: (response: GoogleCredentialResponse) => void;
+          }) => void;
+          renderButton: (element: HTMLElement, options: Record<string, unknown>) => void;
+        };
+      };
+    };
+  }
+}
+
+let googleScriptPromise: Promise<void> | null = null;
 
 export function createMartirApp(root: HTMLDivElement) {
   const state = createInitialState();
@@ -69,17 +91,31 @@ export function createMartirApp(root: HTMLDivElement) {
   root.addEventListener('focusout', (event) => {
     const input = event.target as HTMLInputElement;
 
-    if (!(input instanceof HTMLInputElement) || input.form?.id !== 'client-form') {
+    if (!(input instanceof HTMLInputElement)) {
       return;
     }
 
-    if (input.name === 'cep') {
-      void fillClientAddressFromCep(input.form, input.value);
+    if (input.form?.id === 'onboarding-form') {
+      if (input.name === 'cep') {
+        void fillCompanyAddressFromCep(input.form, input.value);
+        return;
+      }
+
+      if (input.name === 'cnpj') {
+        void fillCompanyFromCnpj(input.form);
+      }
       return;
     }
 
-    if (input.name === 'cpfCnpj') {
-      void fillClientFromCnpj(input.form);
+    if (input.form?.id === 'client-form') {
+      if (input.name === 'cep') {
+        void fillClientAddressFromCep(input.form, input.value);
+        return;
+      }
+
+      if (input.name === 'cpfCnpj') {
+        void fillClientFromCnpj(input.form);
+      }
     }
   });
 
@@ -111,6 +147,7 @@ export function createMartirApp(root: HTMLDivElement) {
   function render() {
     if (!state.token) {
       root.innerHTML = `${renderAuth(state)}${renderToast(state)}`;
+      window.setTimeout(mountGoogleLogin, 0);
       return;
     }
 
@@ -136,6 +173,12 @@ export function createMartirApp(root: HTMLDivElement) {
 
   async function handleAction(button: HTMLButtonElement) {
     const action = button.dataset.action;
+
+    if (action === 'auth-mode') {
+      state.authMode = button.dataset.mode === 'onboarding' ? 'onboarding' : 'login';
+      render();
+      return;
+    }
 
     if (action === 'switch-view' || action === 'open-module') {
       state.view = (button.dataset.view || 'dashboard') as AppView;
@@ -250,6 +293,11 @@ export function createMartirApp(root: HTMLDivElement) {
         return;
       }
 
+      if (form.id === 'onboarding-form') {
+        await submitOnboarding(formData);
+        return;
+      }
+
       if (form.id === 'search-form') {
         state.search = String(formData.get('search') || '').trim();
         render();
@@ -296,6 +344,58 @@ export function createMartirApp(root: HTMLDivElement) {
 
     await bootAuthenticatedArea();
     showToast('Login realizado.', 'success');
+  }
+
+  async function submitGoogleLogin(credential: string) {
+    try {
+      state.apiUrl = DEFAULT_API_URL;
+      localStorage.removeItem(STORAGE_KEYS.apiUrl);
+
+      const result = await loginWithGoogle(api, credential);
+
+      state.token = result.token;
+      state.usuario = result.usuario;
+      localStorage.setItem(STORAGE_KEYS.token, result.token);
+
+      await bootAuthenticatedArea();
+      showToast('Login com Google realizado.', 'success');
+    } catch (error) {
+      showToast(messageFromError(error) || 'Nao foi possivel entrar com Google.', 'error');
+    }
+  }
+
+  async function submitOnboarding(formData: FormData) {
+    state.apiUrl = DEFAULT_API_URL;
+    localStorage.removeItem(STORAGE_KEYS.apiUrl);
+
+    await onboard(api, {
+      empresa: compactBody({
+        razaoSocial: textField(formData, 'razaoSocial'),
+        nomeFantasia: textField(formData, 'nomeFantasia'),
+        cnpj: textField(formData, 'cnpj'),
+        inscricaoMunicipal: textField(formData, 'inscricaoMunicipal'),
+        regimeTributario: textField(formData, 'regimeTributario') || 'SIMPLES_NACIONAL',
+        regimeEspecialTributacao: 'NENHUM',
+        email: textField(formData, 'empresaEmail'),
+        telefone: textField(formData, 'telefone'),
+        cep: textField(formData, 'cep'),
+        endereco: textField(formData, 'endereco'),
+        numero: textField(formData, 'numero'),
+        bairro: textField(formData, 'bairro'),
+        cidade: textField(formData, 'cidade'),
+        uf: textField(formData, 'uf').toUpperCase(),
+        codigoMunicipioIbge: textField(formData, 'codigoMunicipioIbge'),
+      }),
+      proprietario: {
+        nome: formData.get('nome'),
+        email: formData.get('email'),
+        senha: formData.get('senha'),
+      },
+    });
+
+    state.authMode = 'login';
+    render();
+    showToast('Cadastro criado. Faca login para continuar.', 'success');
   }
 
   async function submitNote(formData: FormData) {
@@ -478,6 +578,45 @@ export function createMartirApp(root: HTMLDivElement) {
     }
   }
 
+  async function fillCompanyFromCnpj(form: HTMLFormElement) {
+    const cnpj = getClientField(form, 'cnpj');
+    const digits = cnpj.replace(/\D/g, '');
+
+    if (!digits) {
+      setCompanyLookupStatus(form, 'cnpj', '', '');
+      return;
+    }
+
+    if (digits.length !== 14) {
+      setCompanyLookupStatus(form, 'cnpj', 'CNPJ precisa ter 14 digitos.', 'error');
+      return;
+    }
+
+    setCompanyLookupStatus(form, 'cnpj', 'Buscando CNPJ...', '');
+
+    try {
+      const company = await fetchCompanyByCnpj(digits);
+
+      setClientField(form, 'cnpj', company.cnpj);
+      setClientField(form, 'razaoSocial', company.nomeRazaoSocial);
+      setClientField(form, 'empresaEmail', company.email);
+      setClientField(form, 'telefone', company.telefone);
+      setClientField(form, 'cep', company.cep);
+      setClientField(form, 'endereco', company.endereco);
+      setClientField(form, 'numero', company.numero);
+      setClientField(form, 'bairro', company.bairro);
+      setClientField(form, 'cidade', company.cidade);
+      setClientField(form, 'uf', company.uf);
+      setCompanyLookupStatus(form, 'cnpj', 'Dados preenchidos pelo CNPJ.', 'success');
+
+      if (company.cep) {
+        await fillCompanyAddressFromCep(form, company.cep);
+      }
+    } catch (error) {
+      setCompanyLookupStatus(form, 'cnpj', messageFromError(error), 'error');
+    }
+  }
+
   async function fillClientAddressFromCep(form: HTMLFormElement, cep: string) {
     const digits = cep.replace(/\D/g, '');
 
@@ -510,6 +649,41 @@ export function createMartirApp(root: HTMLDivElement) {
       setClientLookupStatus(form, 'cep', 'Endereco preenchido pelo CEP.', 'success');
     } catch (error) {
       setClientLookupStatus(form, 'cep', messageFromError(error), 'error');
+    }
+  }
+
+  async function fillCompanyAddressFromCep(form: HTMLFormElement, cep: string) {
+    const digits = cep.replace(/\D/g, '');
+
+    if (!digits) {
+      setCompanyLookupStatus(form, 'cep', '', '');
+      return;
+    }
+
+    if (digits.length !== 8) {
+      setCompanyLookupStatus(form, 'cep', 'CEP precisa ter 8 digitos.', 'error');
+      return;
+    }
+
+    setCompanyLookupStatus(form, 'cep', 'Buscando CEP...', '');
+
+    try {
+      const address = await fetchAddressByCep(digits);
+
+      if (!address) {
+        setCompanyLookupStatus(form, 'cep', 'CEP nao encontrado.', 'error');
+        return;
+      }
+
+      setClientField(form, 'cep', address.cep);
+      setClientField(form, 'endereco', address.endereco);
+      setClientField(form, 'bairro', address.bairro);
+      setClientField(form, 'cidade', address.cidade);
+      setClientField(form, 'uf', address.uf);
+      setClientField(form, 'codigoMunicipioIbge', address.codigoMunicipioIbge);
+      setCompanyLookupStatus(form, 'cep', 'Endereco preenchido pelo CEP.', 'success');
+    } catch (error) {
+      setCompanyLookupStatus(form, 'cep', messageFromError(error), 'error');
     }
   }
 
@@ -771,6 +945,89 @@ export function createMartirApp(root: HTMLDivElement) {
     button.title = shouldShow ? 'Ocultar senha' : 'Mostrar senha';
   }
 
+  function mountGoogleLogin() {
+    const container = root.querySelector<HTMLElement>('#google-login-button');
+    const status = root.querySelector<HTMLElement>('[data-google-login-status]');
+
+    if (!container) {
+      return;
+    }
+
+    if (!GOOGLE_CLIENT_ID) {
+      return;
+    }
+
+    if (container.dataset.ready === 'true') {
+      return;
+    }
+
+    container.dataset.ready = 'true';
+    loadGoogleScript()
+      .then(() => {
+        if (!window.google?.accounts?.id) {
+          throw new Error('Google Identity indisponivel.');
+        }
+
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: (response) => {
+            if (response.credential) {
+              void submitGoogleLogin(response.credential);
+            }
+          },
+        });
+        window.google.accounts.id.renderButton(container, {
+          theme: 'outline',
+          size: 'large',
+          text: 'signin_with',
+          shape: 'rectangular',
+          width: 360,
+        });
+
+        if (status) {
+          status.textContent = '';
+        }
+      })
+      .catch(() => {
+        container.dataset.ready = '';
+
+        if (status) {
+          status.textContent = 'Nao foi possivel carregar o login Google.';
+        }
+      });
+  }
+
+  function loadGoogleScript(): Promise<void> {
+    if (window.google?.accounts?.id) {
+      return Promise.resolve();
+    }
+
+    if (googleScriptPromise) {
+      return googleScriptPromise;
+    }
+
+    googleScriptPromise = new Promise((resolve, reject) => {
+      const existing = document.querySelector<HTMLScriptElement>('script[data-google-identity]');
+
+      if (existing) {
+        existing.addEventListener('load', () => resolve(), { once: true });
+        existing.addEventListener('error', () => reject(), { once: true });
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.dataset.googleIdentity = 'true';
+      script.addEventListener('load', () => resolve(), { once: true });
+      script.addEventListener('error', () => reject(), { once: true });
+      document.head.appendChild(script);
+    });
+
+    return googleScriptPromise;
+  }
+
   function toDateInputValue(value?: string): string {
     if (!value) {
       return '';
@@ -883,6 +1140,24 @@ export function createMartirApp(root: HTMLDivElement) {
   ) {
     const element = form.querySelector<HTMLElement>(
       source === 'cep' ? '[data-cep-status]' : '[data-cnpj-status]',
+    );
+
+    if (!element) {
+      return;
+    }
+
+    element.textContent = message;
+    element.dataset.status = status;
+  }
+
+  function setCompanyLookupStatus(
+    form: HTMLFormElement,
+    source: 'cep' | 'cnpj',
+    message: string,
+    status: 'success' | 'error' | '',
+  ) {
+    const element = form.querySelector<HTMLElement>(
+      source === 'cep' ? '[data-company-cep-status]' : '[data-company-cnpj-status]',
     );
 
     if (!element) {

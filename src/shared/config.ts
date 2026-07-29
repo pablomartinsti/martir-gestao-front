@@ -14,6 +14,7 @@ function resolverDefaultApiUrl(): string {
 }
 
 export const DEFAULT_API_URL = resolverDefaultApiUrl();
+export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
 export const STORAGE_KEYS = {
   apiUrl: 'martir.apiUrl',
