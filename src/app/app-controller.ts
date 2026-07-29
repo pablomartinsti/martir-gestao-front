@@ -590,8 +590,9 @@ export function createMartirApp(root: HTMLDivElement) {
 
   async function submitFiscalConfig(formData: FormData) {
     await updateFiscalConfig(api, {
-      ambienteFiscalPadrao: formData.get('ambienteFiscalPadrao'),
-      serieDpsPadrao: formData.get('serieDpsPadrao'),
+      ambienteFiscalPadrao:
+        state.configuracaoFiscal?.ambienteFiscalPadrao || 'HOMOLOGACAO',
+      serieDpsPadrao: state.configuracaoFiscal?.serieDpsPadrao || '1',
     });
 
     const certificateFile = formData.get('certificadoA1Arquivo');

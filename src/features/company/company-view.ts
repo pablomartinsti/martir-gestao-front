@@ -28,27 +28,13 @@ export function renderCompanyView(state: AppState): string {
       <section class="meta-grid">
         ${renderMetaBox('Cidade/UF', `${empresa?.cidade || '-'} / ${empresa?.uf || '-'}`)}
         ${renderMetaBox('Regime tributario', readableEnum(empresa?.regimeTributario))}
-        ${renderMetaBox('Ambiente fiscal', readableEnum(config?.ambienteFiscalPadrao || 'HOMOLOGACAO'))}
       </section>
       ${
         canManageFiscal
           ? `
       <section class="form-panel">
-        <div class="panel-title"><h2>Configuracao fiscal</h2></div>
+        <div class="panel-title"><h2>Certificado digital</h2></div>
         <form id="fiscal-config-form" class="form-grid">
-          <div class="form-grid two">
-            <div class="field">
-              <label for="ambienteFiscalPadrao">Ambiente fiscal padrao</label>
-              <select id="ambienteFiscalPadrao" name="ambienteFiscalPadrao">
-                <option value="HOMOLOGACAO" ${config?.ambienteFiscalPadrao === 'HOMOLOGACAO' ? 'selected' : ''}>Homologacao</option>
-                <option value="PRODUCAO" ${config?.ambienteFiscalPadrao === 'PRODUCAO' ? 'selected' : ''}>Producao</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="serieDpsPadrao">Serie DPS padrao</label>
-              <input id="serieDpsPadrao" name="serieDpsPadrao" value="${config?.serieDpsPadrao || '1'}" />
-            </div>
-          </div>
           <div class="certificate-box">
             <div class="panel-title">
               <h3>Certificado A1</h3>
@@ -77,7 +63,7 @@ export function renderCompanyView(state: AppState): string {
             </div>
             <small class="field-help">Use arquivo A1 .pfx ou .p12.</small>
           </div>
-          <button class="primary-btn" type="submit">Salvar configuracao</button>
+          <button class="primary-btn" type="submit">Salvar certificado</button>
         </form>
       </section>
           `
