@@ -1,4 +1,4 @@
-import { onboard, login } from '../features/auth/auth-api';
+import { login } from '../features/auth/auth-api';
 import { renderAuth } from '../features/auth/auth-view';
 import type { Cliente } from '../domain/models';
 import { fetchAddressByCep } from '../features/clients/cep-api';
@@ -137,12 +137,6 @@ export function createMartirApp(root: HTMLDivElement) {
   async function handleAction(button: HTMLButtonElement) {
     const action = button.dataset.action;
 
-    if (action === 'auth-mode') {
-      state.authMode = button.dataset.mode === 'onboarding' ? 'onboarding' : 'login';
-      render();
-      return;
-    }
-
     if (action === 'switch-view' || action === 'open-module') {
       state.view = (button.dataset.view || 'dashboard') as AppView;
       state.modal = null;
@@ -256,11 +250,6 @@ export function createMartirApp(root: HTMLDivElement) {
         return;
       }
 
-      if (form.id === 'onboarding-form') {
-        await submitOnboarding(formData);
-        return;
-      }
-
       if (form.id === 'search-form') {
         state.search = String(formData.get('search') || '').trim();
         render();
@@ -296,8 +285,8 @@ export function createMartirApp(root: HTMLDivElement) {
   }
 
   async function submitLogin(formData: FormData) {
-    state.apiUrl = String(formData.get('apiUrl') || DEFAULT_API_URL).trim();
-    localStorage.setItem(STORAGE_KEYS.apiUrl, state.apiUrl);
+    state.apiUrl = DEFAULT_API_URL;
+    localStorage.removeItem(STORAGE_KEYS.apiUrl);
 
     const result = await login(api, formData.get('email'), formData.get('senha'));
 
@@ -307,30 +296,6 @@ export function createMartirApp(root: HTMLDivElement) {
 
     await bootAuthenticatedArea();
     showToast('Login realizado.', 'success');
-  }
-
-  async function submitOnboarding(formData: FormData) {
-    state.apiUrl = String(formData.get('apiUrl') || DEFAULT_API_URL).trim();
-    localStorage.setItem(STORAGE_KEYS.apiUrl, state.apiUrl);
-
-    await onboard(api, {
-      empresa: {
-        razaoSocial: formData.get('razaoSocial'),
-        cnpj: formData.get('cnpj'),
-        regimeTributario: formData.get('regimeTributario'),
-        cidade: formData.get('cidade'),
-        uf: formData.get('uf'),
-      },
-      proprietario: {
-        nome: formData.get('nome'),
-        email: formData.get('email'),
-        senha: formData.get('senha'),
-      },
-    });
-
-    state.authMode = 'login';
-    render();
-    showToast('Empresa criada. Faca login para continuar.', 'success');
   }
 
   async function submitNote(formData: FormData) {
