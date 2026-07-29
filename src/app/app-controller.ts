@@ -444,28 +444,15 @@ export function createMartirApp(root: HTMLDivElement) {
       }),
     );
 
-    await emitCreatedNote(note.id);
-  }
-
-  async function emitCreatedNote(noteId: string, successMessage = 'Nota enviada para emissao.') {
-    try {
-      const readiness = await getReadiness(api, noteId);
-
-      if (!readiness.pronto) {
-        throw new Error(`Pendencias fiscais: ${formatFiscalPendencies(readiness.pendencias)}`);
-      }
-
-      await sendDps(api, noteId);
-      await loadResources(api, state);
-      state.view = 'dashboard';
-      render();
-      showToast(successMessage, 'success');
-    } catch (error) {
-      await loadResources(api, state);
-      state.view = 'notes';
-      render();
-      throw new Error(`A nota foi criada, mas nao foi emitida. ${messageFromError(error)}`);
-    }
+    await loadResources(api, state);
+    state.view = 'notes';
+    state.modal = {
+      type: 'note',
+      title: `Rascunho DPS ${note.numeroDps || note.id}`,
+      data: state.notas.find((item) => item.id === note.id) || note,
+    };
+    render();
+    showToast('Rascunho criado. Confira os dados antes de emitir.', 'success');
   }
 
   function submitDashboardRange(formData: FormData) {
@@ -916,7 +903,15 @@ export function createMartirApp(root: HTMLDivElement) {
       motivoSubstituicao,
     });
 
-    await emitCreatedNote(replacement.id, 'Substituicao enviada para emissao.');
+    await loadResources(api, state);
+    state.view = 'notes';
+    state.modal = {
+      type: 'note',
+      title: `Rascunho de substituicao DPS ${replacement.numeroDps || replacement.id}`,
+      data: state.notas.find((item) => item.id === replacement.id) || replacement,
+    };
+    render();
+    showToast('Rascunho de substituicao criado. Confira os dados antes de emitir.', 'success');
   }
 
   async function mutateNote(noteId: string, mutation: () => Promise<unknown>, successMessage: string) {
@@ -1028,8 +1023,8 @@ export function createMartirApp(root: HTMLDivElement) {
       'client-form': 'Salvando cliente...',
       'service-form': 'Salvando servico...',
       'fiscal-config-form': 'Salvando certificado...',
-      'note-form': 'Emitindo nota...',
-      'replacement-form': 'Emitindo substituicao...',
+      'note-form': 'Gerando rascunho...',
+      'replacement-form': 'Gerando rascunho...',
       'dashboard-range-form': 'Aplicando...',
       'search-form': 'Buscando...',
     };

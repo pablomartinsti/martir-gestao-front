@@ -30,7 +30,7 @@ export function renderDashboardView(state: AppState): string {
         <h1>NFS-e</h1>
         <p>Acompanhe suas notas emitidas, faturamento e ultimas emissoes.</p>
       </div>
-      <button class="primary-btn" data-action="switch-view" data-view="new-note">+ Emitir nota</button>
+      <button class="primary-btn" data-action="switch-view" data-view="new-note">+ Nova nota</button>
     </section>
     <section class="main-stack">
       ${renderDashboardPeriodFilter(state, emittedCount)}
@@ -53,7 +53,7 @@ export function renderNotesView(state: AppState): string {
         <h1>Notas</h1>
         <p>${filtered.length} nota(s) encontrada(s).</p>
       </div>
-      <button class="primary-btn" data-action="switch-view" data-view="new-note">+ Emitir nota</button>
+      <button class="primary-btn" data-action="switch-view" data-view="new-note">+ Nova nota</button>
     </section>
     ${renderNotesTable(state, filtered.slice().reverse(), true)}
   `;
@@ -69,8 +69,8 @@ export function renderNewNoteView(state: AppState): string {
     <section class="section-head">
       <div>
         <p class="eyebrow">NFS-e</p>
-        <h1>Emitir nota</h1>
-        <p>Preencha os dados da prestacao de servico e emita a NFS-e.</p>
+        <h1>Nova nota</h1>
+        <p>Preencha os dados, gere o rascunho e confira antes de emitir.</p>
       </div>
     </section>
     <section class="form-panel">
@@ -118,7 +118,7 @@ export function renderNewNoteView(state: AppState): string {
           <label for="descricao">Descricao</label>
           <textarea id="descricao" name="descricao" required></textarea>
         </div>
-        <button class="primary-btn" type="submit">Emitir nota</button>
+        <button class="primary-btn" type="submit">Gerar rascunho</button>
       </form>
     </section>
   `;
