@@ -6,10 +6,10 @@ import type {
 } from '../../domain/models';
 import { escapeHtml } from '../../shared/utils/dom';
 import { formatCurrency, formatDate, readableEnum, statusLabel } from '../../shared/utils/formatters';
-import { canDownloadDanfse } from '../nfse/components/note-action-rules';
-import { clientName, serviceName } from '../nfse/nfse-selectors';
-import { serviceOptionLabel } from '../services/service-labels';
-import { renderMetaBox } from './meta-box';
+import { canDownloadDanfse } from '../../features/nfse/components/NoteActions';
+import { clientName, serviceName } from '../../features/nfse/nfse-selectors';
+import { serviceOptionLabel } from '../../features/services/service-labels';
+import { renderMetaBox } from '../MetaBox';
 
 export function renderModal(state: AppState): string {
   if (!state.modal) {

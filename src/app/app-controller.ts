@@ -24,7 +24,7 @@ import {
 } from '../features/nfse/nfse-view';
 import { createService, updateServiceStatus } from '../features/services/services-api';
 import { renderServicesView } from '../features/services/services-view';
-import { renderModal } from '../features/shared/modal-view';
+import { renderModal } from '../components/Modal';
 import { renderToast } from '../features/shared/toast-view';
 import { DEFAULT_API_URL, GOOGLE_CLIENT_ID, STORAGE_KEYS } from '../shared/config';
 import { createApiClient } from '../shared/api/http-client';

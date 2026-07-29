@@ -1,3 +1,3 @@
-export { renderDashboardView } from './views/dashboard-view';
-export { renderNewNoteView } from './views/new-note-view';
-export { renderNotesView } from './views/notes-view';
+export { renderDashboardView } from './pages/Dashboard';
+export { renderNewNoteView } from './pages/NewNote';
+export { renderNotesView } from './pages/Notes';

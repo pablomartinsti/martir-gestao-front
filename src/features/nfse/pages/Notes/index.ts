@@ -1,6 +1,6 @@
-import type { AppState } from '../../../app/app-state';
-import { filterNotes } from '../nfse-selectors';
-import { renderNotesTable } from '../components/notes-table';
+import type { AppState } from '../../../../app/app-state';
+import { filterNotes } from '../../nfse-selectors';
+import { renderNotesTable } from '../../components/NotesTable';
 
 export function renderNotesView(state: AppState): string {
   const filtered = filterNotes(state, state.notas);

@@ -1,18 +1,18 @@
-import type { AppState } from '../../../app/app-state';
-import type { NotaServico } from '../../../domain/models';
-import { escapeHtml } from '../../../shared/utils/dom';
+import type { AppState } from '../../../../app/app-state';
+import type { NotaServico } from '../../../../domain/models';
+import { escapeHtml } from '../../../../shared/utils/dom';
 import {
   formatCurrency,
   formatDate,
   formatNumber,
   statusLabel,
-} from '../../../shared/utils/formatters';
+} from '../../../../shared/utils/formatters';
 import {
   clientName,
   filterNotesByDashboardPeriod,
   getDashboardDateRange,
   getDashboardMovement,
-} from '../nfse-selectors';
+} from '../../nfse-selectors';
 
 export function renderDashboardView(state: AppState): string {
   const dashboardNotes = filterNotesByDashboardPeriod(state);

@@ -1,14 +1,14 @@
-import type { AppState } from '../../../app/app-state';
-import type { NotaServico } from '../../../domain/models';
-import { escapeHtml } from '../../../shared/utils/dom';
+import type { AppState } from '../../../../app/app-state';
+import type { NotaServico } from '../../../../domain/models';
+import { escapeHtml } from '../../../../shared/utils/dom';
 import {
   formatCurrency,
   formatDate,
   statusClass,
   statusLabel,
-} from '../../../shared/utils/formatters';
-import { clientName, serviceName } from '../nfse-selectors';
-import { canDownloadDanfse } from './note-action-rules';
+} from '../../../../shared/utils/formatters';
+import { clientName, serviceName } from '../../nfse-selectors';
+import { canDownloadDanfse } from '../NoteActions';
 
 export function renderNotesTable(state: AppState, notas: NotaServico[], withToolbar: boolean): string {
   return `

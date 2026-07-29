@@ -1,4 +1,4 @@
-import type { NotaServico } from '../../../domain/models';
+import type { NotaServico } from '../../../../domain/models';
 
 export function canDownloadDanfse(nota: NotaServico): boolean {
   return (

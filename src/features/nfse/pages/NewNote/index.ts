@@ -1,7 +1,7 @@
-import type { AppState } from '../../../app/app-state';
-import { escapeHtml } from '../../../shared/utils/dom';
-import { formatDocument } from '../../../shared/utils/formatters';
-import { serviceOptionLabel } from '../../services/service-labels';
+import type { AppState } from '../../../../app/app-state';
+import { escapeHtml } from '../../../../shared/utils/dom';
+import { formatDocument } from '../../../../shared/utils/formatters';
+import { serviceOptionLabel } from '../../../services/service-labels';
 
 export function renderNewNoteView(state: AppState): string {
   const activeClients = state.clientes.filter((cliente) => cliente.ativo);
