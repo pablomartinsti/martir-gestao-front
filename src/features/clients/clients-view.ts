@@ -16,7 +16,7 @@ export function renderClientsView(state: AppState): string {
         <p>Cadastre e atualize os tomadores das notas.</p>
       </div>
     </section>
-    <section class="resource-grid">
+    <section class="resource-grid clients-resource-grid">
       <div class="form-panel">
         <div class="panel-title">
           <h2>${isEditing ? 'Editar cliente' : 'Novo cliente'}</h2>
