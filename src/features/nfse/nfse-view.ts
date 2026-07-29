@@ -193,7 +193,7 @@ function renderNoteRow(state: AppState, nota: NotaServico): string {
   return `
     <tr>
       <td>${escapeHtml(nota.numeroNfse || nota.numeroDps || '-')}</td>
-      <td>${formatDate(nota.dataEmissao || nota.dataCompetencia || nota.createdAt)}</td>
+      <td>${nota.dataEmissao ? formatDate(nota.dataEmissao) : '-'}</td>
       <td>${escapeHtml(clientName(state, nota.clienteId))}</td>
       <td>${escapeHtml(serviceDetails(state, nota.servicoId))}</td>
       <td>${formatCurrency(nota.valorServico)}</td>

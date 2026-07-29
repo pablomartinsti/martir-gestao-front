@@ -24,7 +24,7 @@ export function formatDateOnly(value?: string): string {
     return '-';
   }
 
-  const date = new Date(value);
+  const date = parseDateOnlyAsLocal(value) || new Date(value);
   if (Number.isNaN(date.getTime())) {
     return '-';
   }
@@ -34,6 +34,16 @@ export function formatDateOnly(value?: string): string {
     month: '2-digit',
     year: 'numeric',
   }).format(date);
+}
+
+function parseDateOnlyAsLocal(value: string): Date | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return null;
+  }
+
+  const [year, month, day] = value.split('-').map(Number);
+
+  return new Date(year, month - 1, day);
 }
 
 export function formatCurrency(value?: number): string {
