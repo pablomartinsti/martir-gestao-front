@@ -12,6 +12,7 @@ import {
   cancelNfse,
   createNote,
   deleteDraftNote,
+  downloadDanfsePdf,
   getReadiness,
   replaceNfse,
   sendDps,
@@ -296,6 +297,11 @@ export function createMartirApp(root: HTMLDivElement) {
 
     if (action === 'delete-draft-note') {
       await deleteDraft(noteId);
+      return;
+    }
+
+    if (action === 'download-danfse') {
+      await downloadNotePdf(noteId);
       return;
     }
 
@@ -870,6 +876,29 @@ export function createMartirApp(root: HTMLDivElement) {
     );
   }
 
+  async function downloadNotePdf(noteId: string) {
+    const note = state.notas.find((item) => item.id === noteId);
+
+    if (!note) {
+      throw new Error('Nota nao encontrada.');
+    }
+
+    if (!note.chaveAcesso) {
+      throw new Error('Esta nota ainda nao possui chave de acesso para baixar o PDF.');
+    }
+
+    const pdf = await downloadDanfsePdf(
+      {
+        apiUrl: state.apiUrl,
+        token: state.token,
+      },
+      noteId,
+    );
+
+    triggerFileDownload(pdf, danfseFileName(note));
+    showToast('PDF baixado.', 'success');
+  }
+
   async function createReplacementDraft(noteId: string) {
     const note = state.notas.find((item) => item.id === noteId);
 
@@ -1058,6 +1087,7 @@ export function createMartirApp(root: HTMLDivElement) {
       'client-fetch-cnpj': 'Buscando...',
       'emit-note': 'Emitindo...',
       'delete-draft-note': 'Excluindo...',
+      'download-danfse': 'Baixando...',
       'cancel-nfse': 'Cancelando...',
       'replace-nfse': 'Preparando...',
     };
@@ -1277,6 +1307,32 @@ export function createMartirApp(root: HTMLDivElement) {
     }
 
     return value;
+  }
+
+  function triggerFileDownload(blob: Blob, fileName: string) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function danfseFileName(note: { numeroNfse?: string; numeroDps?: string; id: string }): string {
+    const number = sanitizeFileName(note.numeroNfse || note.numeroDps || note.id);
+
+    return `nfse-${number}.pdf`;
+  }
+
+  function sanitizeFileName(value: string): string {
+    return value
+      .replace(/[^a-zA-Z0-9._-]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '') || 'nota';
   }
 
   function fileToBase64(file: File): Promise<string> {

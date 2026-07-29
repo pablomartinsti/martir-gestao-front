@@ -216,6 +216,10 @@ function renderNoteActions(nota: NotaServico): string {
     actions.push(`<button class="danger-btn compact" data-action="delete-draft-note" data-id="${nota.id}">Excluir</button>`);
   }
 
+  if ((nota.status === 'EMITIDA' || nota.status === 'SUBSTITUIDA') && nota.chaveAcesso) {
+    actions.push(`<button class="action-btn" data-action="download-danfse" data-id="${nota.id}">PDF</button>`);
+  }
+
   if (nota.status === 'EMITIDA') {
     actions.push(`<button class="action-btn" data-action="replace-nfse" data-id="${nota.id}">Substituir</button>`);
     actions.push(`<button class="danger-btn compact" data-action="cancel-nfse" data-id="${nota.id}">Cancelar</button>`);
