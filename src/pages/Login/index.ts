@@ -1,3 +1,4 @@
+import './styles.css';
 import type { AppState } from '../../app/app-state';
 import { GOOGLE_CLIENT_ID } from '../../config';
 

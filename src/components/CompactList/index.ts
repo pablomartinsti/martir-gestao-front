@@ -1,3 +1,4 @@
+import './styles.css';
 import { escapeHtml } from '../../utils/dom';
 
 export function renderCompactList<T>(

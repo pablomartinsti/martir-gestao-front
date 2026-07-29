@@ -1,0 +1,25 @@
+.certificate-box {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  padding: 14px;
+}
+
+.certificate-box .panel-title {
+  margin-bottom: 0;
+}
+
+.certificate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.certificate-expiry {
+  color: var(--ink-900);
+  font-size: 0.9rem;
+}

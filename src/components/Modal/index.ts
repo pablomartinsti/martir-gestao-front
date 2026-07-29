@@ -1,3 +1,4 @@
+import './styles.css';
 import type { AppState } from '../../app/app-state';
 import type {
   NotaServico,

@@ -1,0 +1,34 @@
+.compact-list {
+  display: grid;
+  gap: 10px;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 12px;
+}
+
+.list-copy {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.list-item strong {
+  color: var(--ink-900);
+}
+
+.list-item span {
+  color: var(--ink-500);
+  font-size: 0.84rem;
+}
+
+.list-actions {
+  flex: 0 0 auto;
+}
