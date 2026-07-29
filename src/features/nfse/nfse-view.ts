@@ -65,9 +65,6 @@ export function renderNewNoteView(state: AppState): string {
   const activeServices = state.servicos.filter((servico) => servico.ativo);
   const serieDps = state.configuracaoFiscal?.serieDpsPadrao || '1';
   const codigoMunicipioPrestacao = state.empresa?.codigoMunicipioIbge || '';
-  const municipioPrestacao = codigoMunicipioPrestacao
-    ? `${codigoMunicipioPrestacao} - ${state.empresa?.cidade || ''}/${state.empresa?.uf || ''}`
-    : 'Nao configurado';
 
   return `
     <section class="section-head">
@@ -116,11 +113,6 @@ export function renderNewNoteView(state: AppState): string {
             <label for="dataCompetencia">Data de competencia</label>
             <input id="dataCompetencia" name="dataCompetencia" type="date" value="${todayInputValue()}" required />
           </div>
-        </div>
-        <div class="meta-grid">
-          ${renderMetaBox('Serie DPS', serieDps)}
-          ${renderMetaBox('Municipio prestacao', municipioPrestacao)}
-          ${renderMetaBox('Ambiente', state.configuracaoFiscal?.ambienteFiscalPadrao || '-')}
         </div>
         <div class="field">
           <label for="descricao">Descricao</label>
