@@ -40,7 +40,6 @@ export function renderDashboardView(state: AppState): string {
         ${renderMovementChart(state, 'Faturamento por mes', dashboardNotes)}
         ${renderRecentActivity(state, dashboardNotes)}
       </div>
-      ${renderNotesTable(state, dashboardNotes.slice().reverse().slice(0, 6), false)}
     </section>
   `;
 }
