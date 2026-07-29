@@ -3,12 +3,12 @@ import type {
   NotaServico,
   NotaServicoEventoFiscal,
   ProntidaoFiscal,
-} from '../../domain/models';
-import { escapeHtml } from '../../shared/utils/dom';
-import { formatCurrency, formatDate, readableEnum, statusLabel } from '../../shared/utils/formatters';
-import { canDownloadDanfse } from '../../features/nfse/components/NoteActions';
-import { clientName, serviceName } from '../../features/nfse/nfse-selectors';
-import { serviceOptionLabel } from '../../features/services/service-labels';
+} from '../../types/models';
+import { escapeHtml } from '../../utils/dom';
+import { formatCurrency, formatDate, readableEnum, statusLabel } from '../../utils/formatters';
+import { canDownloadDanfse } from '../NoteActions';
+import { clientName, serviceName } from '../../utils/nfseSelectors';
+import { serviceOptionLabel } from '../../utils/serviceLabels';
 import { renderMetaBox } from '../MetaBox';
 
 export function renderModal(state: AppState): string {

@@ -5,8 +5,8 @@ import type {
   NotaServico,
   Servico,
   Usuario,
-} from '../domain/models';
-import { DEFAULT_API_URL, STORAGE_KEYS } from '../shared/config';
+} from '../types/models';
+import { DEFAULT_API_URL, STORAGE_KEYS } from '../config';
 
 export type AppView =
   | 'dashboard'

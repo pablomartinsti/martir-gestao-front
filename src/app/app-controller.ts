@@ -1,13 +1,13 @@
-import { login, loginWithGoogle, onboard } from '../features/auth/auth-api';
-import { renderAuth } from '../features/auth/auth-view';
-import type { Cliente } from '../domain/models';
-import { fetchAddressByCep } from '../features/clients/cep-api';
-import { fetchCompanyByCnpj } from '../features/clients/cnpj-api';
-import { createClient, updateClient } from '../features/clients/clients-api';
-import { renderClientsView } from '../features/clients/clients-view';
-import { configureCertificateA1, updateFiscalConfig } from '../features/company/company-api';
-import { renderCompanyView } from '../features/company/company-view';
-import { renderAppShell } from '../features/layout/layout-view';
+import { login, loginWithGoogle, onboard } from '../services/authApi';
+import { renderAuth } from '../pages/Login';
+import type { Cliente } from '../types/models';
+import { fetchAddressByCep } from '../services/cepApi';
+import { fetchCompanyByCnpj } from '../services/cnpjApi';
+import { createClient, updateClient } from '../services/clientsApi';
+import { renderClientsView } from '../pages/Clientes';
+import { configureCertificateA1, updateFiscalConfig } from '../services/companyApi';
+import { renderCompanyView } from '../pages/CertificadoDigital';
+import { renderAppShell } from '../components/Layout';
 import {
   cancelNfse,
   createNote,
@@ -16,20 +16,18 @@ import {
   getReadiness,
   replaceNfse,
   sendDps,
-} from '../features/nfse/nfse-api';
-import {
-  renderDashboardView,
-  renderNewNoteView,
-  renderNotesView,
-} from '../features/nfse/nfse-view';
-import { createService, updateServiceStatus } from '../features/services/services-api';
-import { renderServicesView } from '../features/services/services-view';
+} from '../services/nfseApi';
+import { renderDashboardView } from '../pages/Painel';
+import { renderNewNoteView } from '../pages/EmitirNota';
+import { renderNotesView } from '../pages/Notas';
+import { createService, updateServiceStatus } from '../services/servicesApi';
+import { renderServicesView } from '../pages/Servicos';
 import { renderModal } from '../components/Modal';
-import { renderToast } from '../features/shared/toast-view';
-import { DEFAULT_API_URL, GOOGLE_CLIENT_ID, STORAGE_KEYS } from '../shared/config';
-import { createApiClient } from '../shared/api/http-client';
-import { compactBody } from '../shared/utils/dom';
-import { formatDocument } from '../shared/utils/formatters';
+import { renderToast } from '../components/Toast';
+import { DEFAULT_API_URL, GOOGLE_CLIENT_ID, STORAGE_KEYS } from '../config';
+import { createApiClient } from '../services/httpClient';
+import { compactBody } from '../utils/dom';
+import { formatDocument } from '../utils/formatters';
 import { createInitialState, type AppView, type ToastState } from './app-state';
 import { loadAuthenticatedProfile, loadResources } from './resource-loader';
 

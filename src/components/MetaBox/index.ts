@@ -1,4 +1,4 @@
-import { escapeHtml } from '../../shared/utils/dom';
+import { escapeHtml } from '../../utils/dom';
 
 export function renderMetaBox(label: string, value: string): string {
   return `

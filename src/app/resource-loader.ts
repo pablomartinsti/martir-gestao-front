@@ -5,8 +5,8 @@ import type {
   NotaServico,
   PerfilAutenticado,
   Servico,
-} from '../domain/models';
-import type { ApiClient } from '../shared/api/http-client';
+} from '../types/models';
+import type { ApiClient } from '../services/httpClient';
 import type { AppState } from './app-state';
 
 export async function loadAuthenticatedProfile(api: ApiClient, state: AppState) {
