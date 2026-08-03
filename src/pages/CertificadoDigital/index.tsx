@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 
 import type { AppDataState } from '../../types/app';
-import { formatDateOnly } from '../../utils/formatters';
+import { certificateStatusBadge, getCertificateExpirationInfo } from '../../utils/formatters';
 import { PasswordToggle } from '../../components/PasswordToggle';
 import { Button, Eyebrow, Field, FormGrid, Grid, Panel, PanelTitle, SectionHead, StatusBadge } from '../../components/ui';
 import { CertificateActions, CertificateBox, Expiry, Hint, PasswordRow } from './styles';
@@ -18,12 +18,7 @@ export function CertificatePage({ state, onSubmit, onRemoveCertificate }: Certif
   const config = state.configuracaoFiscal;
   const canManageFiscal = state.usuario?.perfil === 'DONO' || state.usuario?.perfil === 'ADMIN';
   const certificateConfigured = Boolean(config?.certificadoA1Configurado) || Boolean(config?.certificadoA1SenhaConfigurada);
-  const certificateLabel = certificateConfigured ? 'Configurado' : 'Nao configurado';
-  const certificateExpiry = certificateConfigured
-    ? config?.certificadoA1ValidoAte
-      ? `Vence em ${formatDateOnly(config.certificadoA1ValidoAte)}`
-      : 'Validade nao informada'
-    : 'Envie o certificado A1 para emitir em produção.';
+  const certificateInfo = getCertificateExpirationInfo(certificateConfigured, config?.certificadoA1ValidoAte);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -56,9 +51,7 @@ export function CertificatePage({ state, onSubmit, onRemoveCertificate }: Certif
               <PanelTitle>
                 <h3>Certificado A1</h3>
                 <CertificateActions>
-                  <StatusBadge $status={certificateConfigured ? 'EMITIDA' : 'RASCUNHO'}>
-                    {certificateLabel}
-                  </StatusBadge>
+                  <StatusBadge $status={certificateStatusBadge(certificateInfo.status)}>{certificateInfo.label}</StatusBadge>
                   {certificateConfigured ? (
                     <Button type="button" $tone="danger" $compact onClick={() => void onRemoveCertificate()}>
                       Remover certificado
@@ -66,7 +59,10 @@ export function CertificatePage({ state, onSubmit, onRemoveCertificate }: Certif
                   ) : null}
                 </CertificateActions>
               </PanelTitle>
-              <Expiry>{certificateExpiry}</Expiry>
+              <Expiry $status={certificateInfo.status}>
+                <strong>{certificateInfo.label}</strong>
+                <span>{certificateInfo.detail}</span>
+              </Expiry>
               <Grid $columns={2}>
                 <Field>
                   Arquivo

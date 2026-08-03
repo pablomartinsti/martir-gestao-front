@@ -1,4 +1,4 @@
-export type PerfilUsuario = 'DONO' | 'ADMIN' | 'OPERADOR';
+export type PerfilUsuario = 'DONO' | 'ADMIN' | 'OPERADOR' | 'ADMIN_SISTEMA';
 export type AmbienteFiscal = 'PRODUCAO' | 'HOMOLOGACAO';
 export type StatusNota =
   | 'RASCUNHO'
@@ -17,6 +17,111 @@ export interface Usuario {
   ativo: boolean;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export type StatusEventoFiscal = 'PENDENTE' | 'SUCESSO' | 'ERRO';
+
+export interface AdminEmpresaResumo {
+  id: string;
+  razaoSocial: string;
+  cnpj: string;
+  cidade: string;
+  uf: string;
+  ativo: boolean;
+}
+
+export interface AdminResumoNotasEmpresa {
+  total: number;
+  emitidas: number;
+  rascunhos: number;
+  processando: number;
+  erros: number;
+  canceladas: number;
+  substituidas: number;
+}
+
+export interface AdminConfiguracaoFiscalEmpresaResumo {
+  ambienteFiscalPadrao: AmbienteFiscal;
+  serieDpsPadrao: string;
+  emissaoHabilitada: boolean;
+  certificadoA1Configurado: boolean;
+  certificadoA1ValidoAte?: string;
+  ativo: boolean;
+}
+
+export interface AdminEmpresaOperacionalResumo extends AdminEmpresaResumo {
+  configuracaoFiscal: AdminConfiguracaoFiscalEmpresaResumo;
+  notas: AdminResumoNotasEmpresa;
+  ultimoErro?: {
+    notaServicoId: string;
+    numeroNfse?: string;
+    numeroDps?: string;
+    mensagem?: string;
+    updatedAt: string;
+  };
+}
+
+export interface AdminClienteResumo {
+  id: string;
+  nomeRazaoSocial: string;
+  cpfCnpj: string;
+}
+
+export interface AdminServicoResumo {
+  id: string;
+  descricao: string;
+}
+
+export interface AdminUsuarioResumo {
+  id: string;
+  nome: string;
+  email: string;
+}
+
+export interface AdminEventoFiscalResumo {
+  id: string;
+  empresa: AdminEmpresaResumo;
+  notaServicoId: string;
+  usuario?: AdminUsuarioResumo;
+  tipo: string;
+  status: StatusEventoFiscal;
+  statusHttp?: number;
+  chaveAcesso?: string;
+  mensagem?: string;
+  createdAt: string;
+  nota?: {
+    id: string;
+    numeroNfse?: string;
+    serieDps?: string;
+    numeroDps?: string;
+    status: StatusNota;
+    valorServico: number;
+    dataEmissao?: string;
+    cliente: AdminClienteResumo;
+    servico: AdminServicoResumo;
+  };
+}
+
+export interface AdminNotaResumo {
+  id: string;
+  empresa: AdminEmpresaResumo;
+  cliente: AdminClienteResumo;
+  servico: AdminServicoResumo;
+  numeroNfse?: string;
+  serieDps?: string;
+  numeroDps?: string;
+  ambienteFiscal: AmbienteFiscal;
+  status: StatusNota;
+  valorServico: number;
+  valorIss: number;
+  dataCompetencia?: string;
+  dataEmissao?: string;
+  chaveAcesso?: string;
+  mensagemErro?: string;
+  mensagemErroFiscal?: string;
+  createdAt: string;
+  updatedAt: string;
+  ultimoEvento?: Omit<AdminEventoFiscalResumo, 'empresa' | 'nota'>;
 }
 
 export interface Empresa {
@@ -53,6 +158,7 @@ export interface ConfiguracaoFiscalEmpresa {
   certificadoA1Configurado?: boolean;
   certificadoA1ValidoAte?: string;
   certificadoA1SenhaConfigurada: boolean;
+  emissaoHabilitada?: boolean;
   ativo: boolean;
   createdAt?: string;
   updatedAt?: string;

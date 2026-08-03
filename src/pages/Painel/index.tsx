@@ -1,8 +1,17 @@
-import type { FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 
+import { CertificateAttentionModal } from '../../components/CertificateAttentionModal';
 import type { AppDataState, AppView } from '../../types/app';
 import type { NotaServico } from '../../types/models';
-import { formatCurrency, formatDate, formatDateOnly, formatNumber, statusLabel } from '../../utils/formatters';
+import {
+  certificateStatusBadge,
+  formatCurrency,
+  formatDate,
+  formatDateOnly,
+  formatNumber,
+  getCertificateExpirationInfo,
+  statusLabel,
+} from '../../utils/formatters';
 import {
   clientName,
   filterNotesByDashboardPeriod,
@@ -15,6 +24,7 @@ import {
   Bars,
   BarTrack,
   BarWrap,
+  CertificateNotice,
   ChartBadge,
   Dot,
   EmptyRecent,
@@ -45,6 +55,25 @@ export function DashboardPage({
   const range = getDashboardDateRange(dashboardStartDate, dashboardEndDate);
   const dashboardNotes = filterNotesByDashboardPeriod(state.notas, range);
   const emittedCount = dashboardNotes.filter((nota) => nota.status === 'EMITIDA').length;
+  const certificateConfigured = Boolean(state.configuracaoFiscal?.certificadoA1Configurado)
+    || Boolean(state.configuracaoFiscal?.certificadoA1SenhaConfigurada);
+  const certificateInfo = getCertificateExpirationInfo(
+    certificateConfigured,
+    state.configuracaoFiscal?.certificadoA1ValidoAte,
+  );
+  const shouldShowCertificateAlert = certificateInfo.status !== 'ok';
+  const [certificateModalDismissed, setCertificateModalDismissed] = useState(false);
+  const certificateAttentionItems = state.empresa && shouldShowCertificateAlert
+    ? [
+        {
+          detail: certificateInfo.detail,
+          document: state.empresa.cnpj,
+          id: state.empresa.id,
+          name: state.empresa.razaoSocial,
+          status: certificateInfo.status,
+        },
+      ]
+    : [];
 
   function handleRangeSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -65,6 +94,29 @@ export function DashboardPage({
         </Button>
       </SectionHead>
       <Stack>
+        <CertificateAttentionModal
+          items={certificateAttentionItems}
+          message="Seu certificado digital esta vencido, vencendo ou precisa de conferencia. Atualize para evitar erro na emissao de notas."
+          open={shouldShowCertificateAlert && !certificateModalDismissed}
+          primaryLabel="Corrigir agora"
+          onClose={() => setCertificateModalDismissed(true)}
+          onPrimary={() => {
+            setCertificateModalDismissed(true);
+            onNavigate('company');
+          }}
+        />
+        {shouldShowCertificateAlert ? (
+          <CertificateNotice $status={certificateInfo.status}>
+            <div>
+              <span>Certificado digital</span>
+              <strong>{certificateInfo.label}</strong>
+              <small>{certificateInfo.detail}</small>
+            </div>
+            <Button type="button" $tone={certificateStatusBadge(certificateInfo.status) === 'ERRO' ? 'danger' : 'ghost'} onClick={() => onNavigate('company')}>
+              Atualizar certificado
+            </Button>
+          </CertificateNotice>
+        ) : null}
         <PeriodPanel>
           <div>
             <span>Período</span>

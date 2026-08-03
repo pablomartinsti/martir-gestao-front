@@ -1,6 +1,43 @@
 import styled from 'styled-components';
 
 type KpiTone = 'green' | 'gray' | 'amber' | 'red';
+type CertificateStatus = 'ok' | 'warning' | 'expired' | 'missing';
+
+export const CertificateNotice = styled.section<{ $status: CertificateStatus }>`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid ${({ $status }) => certificateBorder($status)};
+  border-radius: var(--radius);
+  background: ${({ $status }) => certificateBackground($status)};
+  padding: 14px 16px;
+
+  span {
+    display: block;
+    color: var(--ink-500);
+    font-size: 0.76rem;
+    font-weight: 900;
+  }
+
+  strong {
+    display: block;
+    margin-top: 3px;
+    color: var(--ink-900);
+  }
+
+  small {
+    display: block;
+    margin-top: 2px;
+    color: var(--ink-500);
+    font-weight: 800;
+  }
+
+  @media (max-width: 720px) {
+    align-items: stretch;
+    flex-direction: column;
+  }
+`;
 
 export const PeriodPanel = styled.section`
   display: flex;
@@ -224,4 +261,16 @@ function symbolColor(tone: KpiTone): string {
   };
 
   return colors[tone];
+}
+
+function certificateBackground(status: CertificateStatus): string {
+  if (status === 'warning') return 'rgba(201, 163, 74, 0.12)';
+  if (status === 'ok') return 'rgba(31, 157, 85, 0.08)';
+  return 'rgba(201, 52, 63, 0.08)';
+}
+
+function certificateBorder(status: CertificateStatus): string {
+  if (status === 'warning') return 'rgba(201, 163, 74, 0.32)';
+  if (status === 'ok') return 'rgba(31, 157, 85, 0.22)';
+  return 'rgba(201, 52, 63, 0.22)';
 }

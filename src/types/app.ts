@@ -7,7 +7,14 @@ import type {
   Usuario,
 } from './models';
 
-export type AppView = 'dashboard' | 'notes' | 'new-note' | 'clients' | 'services' | 'company';
+export type AppView =
+  | 'dashboard'
+  | 'notes'
+  | 'new-note'
+  | 'clients'
+  | 'services'
+  | 'company'
+  | 'operational-admin';
 export type AuthMode = 'login' | 'onboarding';
 
 export type ToastState = {

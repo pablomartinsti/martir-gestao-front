@@ -36,7 +36,18 @@ interface LayoutProps {
 
 export function Layout({ state, view, loading, children, onNavigate, onLogout }: LayoutProps) {
   const canManageSettings = state.usuario?.perfil === 'DONO' || state.usuario?.perfil === 'ADMIN';
-  const visibleNavItems = navItems.filter((item) => canManageSettings || item.view !== 'company');
+  const canUseOperationalAdmin = state.usuario?.perfil === 'ADMIN_SISTEMA';
+  const visibleNavItems = navItems.filter((item) => {
+    if (canUseOperationalAdmin) {
+      return item.adminOnly === true;
+    }
+
+    if (item.adminOnly) {
+      return false;
+    }
+
+    return canManageSettings || item.view !== 'company';
+  });
   const empresaNome = state.empresa?.razaoSocial || state.empresa?.nomeFantasia || 'Empresa ativa';
 
   return (
@@ -59,21 +70,28 @@ export function Layout({ state, view, loading, children, onNavigate, onLogout }:
             </NavButton>
           ))}
         </SideNav>
-        <SidebarCompany>
-          <small>Empresa ativa</small>
-          <strong>{empresaNome}</strong>
-          <span>
-            CNPJ
-            <br />
-            {formatDocument(state.empresa?.cnpj) || '-'}
-          </span>
-        </SidebarCompany>
+        {!canUseOperationalAdmin ? (
+          <SidebarCompany>
+            <small>Empresa ativa</small>
+            <strong>{empresaNome}</strong>
+            <span>
+              CNPJ
+              <br />
+              {formatDocument(state.empresa?.cnpj) || '-'}
+            </span>
+          </SidebarCompany>
+        ) : null}
       </Sidebar>
       <Workspace>
         <Topbar>
           <BrandInline>Martir Gestao</BrandInline>
           <TopbarCenter>
-            {canManageSettings ? (
+            {canUseOperationalAdmin ? (
+              <CompanyBox>
+                <span>Acesso</span>
+                <strong>Admin do sistema</strong>
+              </CompanyBox>
+            ) : canManageSettings ? (
               <CompanyPicker type="button" onClick={() => onNavigate('company')}>
                 <span>Empresa ativa</span>
                 <strong>{empresaNome}</strong>

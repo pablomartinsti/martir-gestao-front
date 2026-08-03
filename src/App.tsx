@@ -11,6 +11,7 @@ import { NewNotePage } from './pages/EmitirNota';
 import { ClientsPage } from './pages/Clientes';
 import { ServicesPage } from './pages/Servicos';
 import { CertificatePage } from './pages/CertificadoDigital';
+import { OperationalPage } from './pages/Operacional';
 import { login, loginWithGoogle, onboard } from './services/authApi';
 import { createClient, updateClient } from './services/clientsApi';
 import { configureCertificateA1, updateFiscalConfig } from './services/companyApi';
@@ -89,6 +90,7 @@ export function App() {
         servicos: resources.servicos,
         usuario: profile.usuario,
       });
+      setView(profile.usuario.perfil === 'ADMIN_SISTEMA' ? 'operational-admin' : 'dashboard');
     } catch (error) {
       clearSession();
       showToast(messageFromError(error) || 'Sessao expirada. Faca login novamente.', 'error');
@@ -524,6 +526,18 @@ export function App() {
             state={data}
             onSubmit={(formData) => safely(() => submitFiscalConfig(formData))}
             onRemoveCertificate={() => safely(removeCertificateA1)}
+          />
+        );
+      case 'operational-admin':
+        return data.usuario?.perfil === 'ADMIN_SISTEMA' ? (
+          <OperationalPage api={api} />
+        ) : (
+          <DashboardPage
+            state={data}
+            dashboardStartDate={dashboardStartDate}
+            dashboardEndDate={dashboardEndDate}
+            onNavigate={navigate}
+            onDashboardRange={submitDashboardRange}
           />
         );
       default:

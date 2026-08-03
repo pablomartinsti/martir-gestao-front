@@ -1,5 +1,14 @@
 import type { StatusNota } from '../types/models';
 
+export type CertificateExpirationStatus = 'ok' | 'warning' | 'expired' | 'missing';
+
+export interface CertificateExpirationInfo {
+  daysUntilExpiration?: number;
+  detail: string;
+  label: string;
+  status: CertificateExpirationStatus;
+}
+
 export function formatDate(value?: string): string {
   if (!value) {
     return '-';
@@ -24,7 +33,7 @@ export function formatDateOnly(value?: string): string {
     return '-';
   }
 
-  const date = parseDateOnlyAsLocal(value) || new Date(value);
+  const date = parseDateAsLocalDay(value) || new Date(value);
   if (Number.isNaN(date.getTime())) {
     return '-';
   }
@@ -36,14 +45,97 @@ export function formatDateOnly(value?: string): string {
   }).format(date);
 }
 
-function parseDateOnlyAsLocal(value: string): Date | null {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+export function getCertificateExpirationInfo(
+  configured?: boolean,
+  expiresAt?: string,
+): CertificateExpirationInfo {
+  if (!configured) {
+    return {
+      detail: 'Envie o certificado A1 para liberar emissoes.',
+      label: 'Nao configurado',
+      status: 'missing',
+    };
+  }
+
+  if (!expiresAt) {
+    return {
+      detail: 'Atualize o certificado para o sistema acompanhar o vencimento.',
+      label: 'Validade nao informada',
+      status: 'warning',
+    };
+  }
+
+  const expirationDate = parseDateAsLocalDay(expiresAt);
+  if (!expirationDate) {
+    return {
+      detail: 'A data salva nao pode ser lida pelo sistema.',
+      label: 'Validade nao informada',
+      status: 'warning',
+    };
+  }
+
+  const today = startOfLocalDay(new Date());
+  const daysUntilExpiration = Math.ceil((expirationDate.getTime() - today.getTime()) / 86_400_000);
+  const formattedDate = formatDateOnly(expiresAt);
+
+  if (daysUntilExpiration < 0) {
+    return {
+      daysUntilExpiration,
+      detail: `Venceu em ${formattedDate}`,
+      label: 'Certificado vencido',
+      status: 'expired',
+    };
+  }
+
+  if (daysUntilExpiration === 0) {
+    return {
+      daysUntilExpiration,
+      detail: `Vence em ${formattedDate}`,
+      label: 'Vence hoje',
+      status: 'warning',
+    };
+  }
+
+  if (daysUntilExpiration <= 30) {
+    return {
+      daysUntilExpiration,
+      detail: `Vence em ${formattedDate}`,
+      label: `Vence em ${daysUntilExpiration} dia${daysUntilExpiration === 1 ? '' : 's'}`,
+      status: 'warning',
+    };
+  }
+
+  return {
+    daysUntilExpiration,
+    detail: `Vence em ${formattedDate}`,
+    label: 'Certificado valido',
+    status: 'ok',
+  };
+}
+
+export function certificateStatusBadge(status: CertificateExpirationStatus): StatusNota {
+  if (status === 'ok') return 'EMITIDA';
+  if (status === 'expired' || status === 'missing') return 'ERRO';
+  return 'RASCUNHO';
+}
+
+function parseDateAsLocalDay(value: string): Date | null {
+  const datePrefix = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (datePrefix) {
+    const [, year, month, day] = datePrefix;
+    return new Date(Number(year), Number(month) - 1, Number(day));
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
     return null;
   }
 
-  const [year, month, day] = value.split('-').map(Number);
+  return startOfLocalDay(date);
+}
 
-  return new Date(year, month - 1, day);
+function startOfLocalDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
 export function formatCurrency(value?: number): string {
