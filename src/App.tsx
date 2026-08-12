@@ -22,6 +22,7 @@ import {
   deleteDraftNote,
   downloadDanfsePdf,
   getReadiness,
+  markNoteErrorResolved,
   replaceNfse,
   returnNoteToDraft,
   sendDps,
@@ -360,6 +361,21 @@ export function App() {
     );
   }
 
+  async function resolveFailedNote(note: NotaServico) {
+    if (
+      !window.confirm(
+        'Marcar este erro como resolvido? Use somente se voce ja emitiu outra nota correta para este servico.',
+      )
+    ) {
+      return;
+    }
+
+    await mutateNote(
+      () => markNoteErrorResolved(api, note.id),
+      'Erro marcado como resolvido.',
+    );
+  }
+
   async function sendDpsAndValidate(noteId: string) {
     const result = await sendDps(api, noteId);
 
@@ -527,7 +543,6 @@ export function App() {
             }
             onEmit={(note) => safely(() => emitRealNote(note))}
             onDeleteDraft={(note) => safely(() => deleteDraft(note))}
-            onRetryFailed={(note) => safely(() => retryFailedNote(note))}
             onDownloadPdf={(note) => safely(() => downloadNotePdf(note))}
             onReplace={createReplacementDraft}
             onCancel={(note) => safely(() => cancelRealNote(note))}
@@ -609,6 +624,7 @@ export function App() {
         onEmit={(note) => safely(() => emitRealNote(note))}
         onDeleteDraft={(note) => safely(() => deleteDraft(note))}
         onRetryFailed={(note) => safely(() => retryFailedNote(note))}
+        onResolveError={(note) => safely(() => resolveFailedNote(note))}
         onDownloadPdf={(note) => safely(() => downloadNotePdf(note))}
         onReplace={createReplacementDraft}
         onCancel={(note) => safely(() => cancelRealNote(note))}

@@ -447,6 +447,7 @@ export function OperationalPage({ api }: OperationalPageProps) {
               <select name="status" defaultValue={filters.status}>
                 <option value="">Todos</option>
                 <option value="ERRO">Erro</option>
+                <option value="ERRO_RESOLVIDO">Erro resolvido</option>
                 <option value="PROCESSANDO">Processando</option>
                 <option value="RASCUNHO">Pendente</option>
                 <option value="EMITIDA">Emitida</option>

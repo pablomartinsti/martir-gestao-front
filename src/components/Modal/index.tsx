@@ -9,7 +9,7 @@ import { serviceOptionLabel } from '../../utils/serviceLabels';
 import { canDownloadDanfse } from '../NoteActions';
 import { MetaBox, MetaGrid } from '../MetaBox';
 import { Button, Empty, Field, FormGrid, PanelTitle } from '../ui';
-import { ActionRow, Backdrop, Body, DetailsStack, Dialog, ErrorMessage, Head, NoteCopy } from './styles';
+import { ActionRow, Backdrop, Body, DetailsStack, Dialog, ErrorMessage, Head, NoteCopy, ResolutionHint } from './styles';
 
 interface ModalProps {
   modal: AppModal;
@@ -18,6 +18,7 @@ interface ModalProps {
   onEmit: (note: NotaServico) => Promise<void>;
   onDeleteDraft: (note: NotaServico) => Promise<void>;
   onRetryFailed: (note: NotaServico) => Promise<void>;
+  onResolveError: (note: NotaServico) => Promise<void>;
   onDownloadPdf: (note: NotaServico) => Promise<void>;
   onReplace: (note: NotaServico) => void;
   onCancel: (note: NotaServico) => Promise<void>;
@@ -31,6 +32,7 @@ export function Modal({
   onEmit,
   onDeleteDraft,
   onRetryFailed,
+  onResolveError,
   onDownloadPdf,
   onReplace,
   onCancel,
@@ -64,6 +66,7 @@ export function Modal({
               onEmit={onEmit}
               onDeleteDraft={onDeleteDraft}
               onRetryFailed={onRetryFailed}
+              onResolveError={onResolveError}
               onDownloadPdf={onDownloadPdf}
               onReplace={onReplace}
               onCancel={onCancel}
@@ -81,6 +84,7 @@ function NoteDetails({
   onEmit,
   onDeleteDraft,
   onRetryFailed,
+  onResolveError,
   onDownloadPdf,
   onReplace,
   onCancel,
@@ -90,6 +94,7 @@ function NoteDetails({
   onEmit: (note: NotaServico) => Promise<void>;
   onDeleteDraft: (note: NotaServico) => Promise<void>;
   onRetryFailed: (note: NotaServico) => Promise<void>;
+  onResolveError: (note: NotaServico) => Promise<void>;
   onDownloadPdf: (note: NotaServico) => Promise<void>;
   onReplace: (note: NotaServico) => void;
   onCancel: (note: NotaServico) => Promise<void>;
@@ -129,7 +134,18 @@ function NoteDetails({
           </>
         ) : null}
         {note.status === 'ERRO' ? (
-          <BusyButton label="Tentar novamente" busyLabel="Tentando..." onClick={() => onRetryFailed(note)} />
+          <>
+            <ResolutionHint>
+              Se voce corrigiu o cadastro e ainda nao emitiu outra nota para este servico, tente emitir esta nota. Se ja emitiu outra nota correta, marque este erro como resolvido.
+            </ResolutionHint>
+            <BusyButton label="Tentar emitir esta nota" busyLabel="Tentando..." onClick={() => onRetryFailed(note)} />
+            <BusyButton
+              label="Ja emiti outra nota"
+              busyLabel="Salvando..."
+              tone="ghost"
+              onClick={() => onResolveError(note)}
+            />
+          </>
         ) : null}
         {canDownloadDanfse(note) ? (
           <BusyButton

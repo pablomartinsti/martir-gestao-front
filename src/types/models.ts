@@ -6,7 +6,8 @@ export type StatusNota =
   | 'EMITIDA'
   | 'SUBSTITUIDA'
   | 'CANCELADA'
-  | 'ERRO';
+  | 'ERRO'
+  | 'ERRO_RESOLVIDO';
 
 export interface Usuario {
   id: string;

@@ -78,6 +78,13 @@ export function replaceNfse(api: ApiClient, noteId: string, body: ReplaceNoteBod
   });
 }
 
+
+export function markNoteErrorResolved(api: ApiClient, noteId: string) {
+  return api<NotaServico>(`/notas-servico/${noteId}/resolver-erro`, {
+    method: 'POST',
+    body: {},
+  });
+}
 export function getReadiness(api: ApiClient, noteId: string) {
   return api<ProntidaoFiscal>(`/notas-servico/${noteId}/prontidao-fiscal`);
 }

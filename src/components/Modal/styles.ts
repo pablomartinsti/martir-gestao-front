@@ -64,3 +64,16 @@ export const ActionRow = styled.div`
   flex-wrap: wrap;
   gap: 10px;
 `;
+
+export const ResolutionHint = styled.p`
+  width: 100%;
+  margin: 0;
+  border: 1px solid rgba(209, 172, 77, 0.38);
+  border-radius: 6px;
+  background: #fff8e1;
+  color: var(--ink-700);
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.45;
+  padding: 12px;
+`;

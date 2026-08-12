@@ -18,7 +18,6 @@ interface NotesTableProps {
   onShowDraft: (note: NotaServico) => void;
   onEmit: (note: NotaServico) => Promise<void>;
   onDeleteDraft: (note: NotaServico) => Promise<void>;
-  onRetryFailed: (note: NotaServico) => Promise<void>;
   onDownloadPdf: (note: NotaServico) => Promise<void>;
   onReplace: (note: NotaServico) => void;
   onCancel: (note: NotaServico) => Promise<void>;
@@ -34,7 +33,6 @@ export function NotesTable({
   onShowDraft,
   onEmit,
   onDeleteDraft,
-  onRetryFailed,
   onDownloadPdf,
   onReplace,
   onCancel,
@@ -140,19 +138,9 @@ export function NotesTable({
                         </>
                       ) : null}
                       {nota.status === 'ERRO' ? (
-                        <>
-                          <Button type="button" $tone="action" onClick={() => onShowDraft(nota)}>
-                            Ver erro
-                          </Button>
-                          <Button
-                            type="button"
-                            $compact
-                            disabled={Boolean(busyAction)}
-                            onClick={() => void runAction('retry', nota, onRetryFailed)}
-                          >
-                            {isBusy('retry', nota) ? 'Tentando...' : 'Tentar novamente'}
-                          </Button>
-                        </>
+                        <Button type="button" $tone="action" onClick={() => onShowDraft(nota)}>
+                          Resolver erro
+                        </Button>
                       ) : null}
                       {canDownloadDanfse(nota) ? (
                         <Button

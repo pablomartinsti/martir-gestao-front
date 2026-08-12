@@ -193,6 +193,7 @@ export function statusLabel(status?: StatusNota): string {
     CANCELADA: 'Cancelada',
     EMITIDA: 'Emitida',
     ERRO: 'Erro',
+    ERRO_RESOLVIDO: 'Erro resolvido',
     PROCESSANDO: 'Processando',
     RASCUNHO: 'Pendente',
     SUBSTITUIDA: 'Substituida',

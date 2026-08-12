@@ -258,13 +258,13 @@ export const StatusBadge = styled.span<{ $status?: string }>`
 function statusBackground(status?: string): string {
   if (status === 'EMITIDA') return 'rgba(31, 157, 85, 0.12)';
   if (status === 'ERRO') return 'rgba(201, 52, 63, 0.1)';
-  if (status === 'CANCELADA' || status === 'SUBSTITUIDA') return 'rgba(104, 112, 141, 0.13)';
+  if (status === 'CANCELADA' || status === 'SUBSTITUIDA' || status === 'ERRO_RESOLVIDO') return 'rgba(104, 112, 141, 0.13)';
   return 'rgba(37, 87, 214, 0.1)';
 }
 
 function statusColor(status?: string): string {
   if (status === 'EMITIDA') return 'var(--green-600)';
   if (status === 'ERRO') return 'var(--red-600)';
-  if (status === 'CANCELADA' || status === 'SUBSTITUIDA') return 'var(--ink-500)';
+  if (status === 'CANCELADA' || status === 'SUBSTITUIDA' || status === 'ERRO_RESOLVIDO') return 'var(--ink-500)';
   return 'var(--blue-650)';
 }
