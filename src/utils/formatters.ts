@@ -1,4 +1,4 @@
-import type { StatusNota } from '../types/models';
+import type { NotaServico, StatusNota } from '../types/models';
 
 export type CertificateExpirationStatus = 'ok' | 'warning' | 'expired' | 'missing';
 
@@ -199,6 +199,39 @@ export function statusLabel(status?: StatusNota): string {
   };
 
   return status ? labels[status] : '-';
+}
+
+const TEMPORARY_PORTAL_ERROR_MESSAGE =
+  'Portal Nacional da NFS-e indisponivel no momento. Tente novamente em alguns minutos.';
+
+export function noteFiscalErrorMessage(
+  nota: Pick<NotaServico, 'mensagemErro' | 'mensagemErroFiscal'>,
+): string {
+  const message = (nota.mensagemErroFiscal || nota.mensagemErro || '').trim();
+
+  if (isTemporaryPortalErrorMessage(message)) {
+    return TEMPORARY_PORTAL_ERROR_MESSAGE;
+  }
+
+  return message || 'Nao foi possivel emitir esta nota.';
+}
+
+export function isTemporaryPortalError(
+  nota: Pick<NotaServico, 'mensagemErro' | 'mensagemErroFiscal'>,
+): boolean {
+  return isTemporaryPortalErrorMessage(nota.mensagemErroFiscal || nota.mensagemErro);
+}
+
+function isTemporaryPortalErrorMessage(value?: string): boolean {
+  const message = String(value || '').toLowerCase();
+
+  return (
+    message.includes('http 503') ||
+    message.includes('service unavailable') ||
+    message.includes('tempo limite excedido') ||
+    message.includes('timeout') ||
+    (message.includes('portal nacional') && message.includes('indispon'))
+  );
 }
 
 export function readableEnum(value?: string): string {

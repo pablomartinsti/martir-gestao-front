@@ -23,6 +23,7 @@ import {
   downloadDanfsePdf,
   getReadiness,
   replaceNfse,
+  returnNoteToDraft,
   sendDps,
 } from './services/nfseApi';
 import { fetchAppResources, fetchAuthenticatedProfile } from './services/resourcesApi';
@@ -41,7 +42,7 @@ import {
   textField,
   triggerFileDownload,
 } from './utils/forms';
-import { formatDocument } from './utils/formatters';
+import { formatDocument, noteFiscalErrorMessage } from './utils/formatters';
 
 const initialData: AppDataState = {
   clientes: [],
@@ -333,10 +334,40 @@ export function App() {
           throw new Error(`Pendencias fiscais: ${formatFiscalPendencies(readiness.pendencias)}`);
         }
 
-        return sendDps(api, note.id);
+        return sendDpsAndValidate(note.id);
       },
-      'NFS-e enviada para emissao.',
+      'NFS-e emitida.',
     );
+  }
+
+  async function retryFailedNote(note: NotaServico) {
+    if (!window.confirm('Tentar emitir esta NFS-e novamente?')) {
+      return;
+    }
+
+    await mutateNote(
+      async () => {
+        const draft = await returnNoteToDraft(api, note.id);
+        const readiness = await getReadiness(api, draft.id);
+
+        if (!readiness.pronto) {
+          throw new Error(`Pendencias fiscais: ${formatFiscalPendencies(readiness.pendencias)}`);
+        }
+
+        return sendDpsAndValidate(draft.id);
+      },
+      'NFS-e emitida.',
+    );
+  }
+
+  async function sendDpsAndValidate(noteId: string) {
+    const result = await sendDps(api, noteId);
+
+    if (result.status === 'ERRO') {
+      throw new Error(noteFiscalErrorMessage(result));
+    }
+
+    return result;
   }
 
   async function cancelRealNote(note: NotaServico) {
@@ -437,6 +468,7 @@ export function App() {
       setModal(null);
       showToast(successMessage, 'success');
     } catch (error) {
+      await refreshResources().catch(() => undefined);
       showToast(messageFromError(error), 'error');
     }
   }
@@ -495,6 +527,7 @@ export function App() {
             }
             onEmit={(note) => safely(() => emitRealNote(note))}
             onDeleteDraft={(note) => safely(() => deleteDraft(note))}
+            onRetryFailed={(note) => safely(() => retryFailedNote(note))}
             onDownloadPdf={(note) => safely(() => downloadNotePdf(note))}
             onReplace={createReplacementDraft}
             onCancel={(note) => safely(() => cancelRealNote(note))}
@@ -575,6 +608,7 @@ export function App() {
         onClose={() => setModal(null)}
         onEmit={(note) => safely(() => emitRealNote(note))}
         onDeleteDraft={(note) => safely(() => deleteDraft(note))}
+        onRetryFailed={(note) => safely(() => retryFailedNote(note))}
         onDownloadPdf={(note) => safely(() => downloadNotePdf(note))}
         onReplace={createReplacementDraft}
         onCancel={(note) => safely(() => cancelRealNote(note))}

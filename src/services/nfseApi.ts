@@ -36,6 +36,13 @@ export function deleteDraftNote(api: ApiClient, noteId: string) {
   });
 }
 
+export function returnNoteToDraft(api: ApiClient, noteId: string) {
+  return api<NotaServico>(`/notas-servico/${noteId}/retornar-rascunho`, {
+    method: 'POST',
+    body: {},
+  });
+}
+
 export async function downloadDanfsePdf(
   context: { apiUrl: string; token: string },
   noteId: string,

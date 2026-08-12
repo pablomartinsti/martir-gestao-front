@@ -13,6 +13,7 @@ interface NotesPageProps {
   onShowDraft: (note: NotaServico) => void;
   onEmit: (note: NotaServico) => Promise<void>;
   onDeleteDraft: (note: NotaServico) => Promise<void>;
+  onRetryFailed: (note: NotaServico) => Promise<void>;
   onDownloadPdf: (note: NotaServico) => Promise<void>;
   onReplace: (note: NotaServico) => void;
   onCancel: (note: NotaServico) => Promise<void>;
@@ -26,6 +27,7 @@ export function NotesPage({
   onShowDraft,
   onEmit,
   onDeleteDraft,
+  onRetryFailed,
   onDownloadPdf,
   onReplace,
   onCancel,
@@ -53,6 +55,7 @@ export function NotesPage({
         onShowDraft={onShowDraft}
         onEmit={onEmit}
         onDeleteDraft={onDeleteDraft}
+        onRetryFailed={onRetryFailed}
         onDownloadPdf={onDownloadPdf}
         onReplace={onReplace}
         onCancel={onCancel}

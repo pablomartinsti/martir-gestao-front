@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 
 import type { AppDataState, AppModal } from '../../types/app';
 import type { NotaServico } from '../../types/models';
-import { formatCurrency, statusLabel } from '../../utils/formatters';
+import { formatCurrency, noteFiscalErrorMessage, statusLabel } from '../../utils/formatters';
 import { currencyInputValue } from '../../utils/forms';
 import { clientName, serviceName } from '../../utils/nfseSelectors';
 import { serviceOptionLabel } from '../../utils/serviceLabels';
@@ -17,6 +17,7 @@ interface ModalProps {
   onClose: () => void;
   onEmit: (note: NotaServico) => Promise<void>;
   onDeleteDraft: (note: NotaServico) => Promise<void>;
+  onRetryFailed: (note: NotaServico) => Promise<void>;
   onDownloadPdf: (note: NotaServico) => Promise<void>;
   onReplace: (note: NotaServico) => void;
   onCancel: (note: NotaServico) => Promise<void>;
@@ -29,6 +30,7 @@ export function Modal({
   onClose,
   onEmit,
   onDeleteDraft,
+  onRetryFailed,
   onDownloadPdf,
   onReplace,
   onCancel,
@@ -61,6 +63,7 @@ export function Modal({
               note={modal.note}
               onEmit={onEmit}
               onDeleteDraft={onDeleteDraft}
+              onRetryFailed={onRetryFailed}
               onDownloadPdf={onDownloadPdf}
               onReplace={onReplace}
               onCancel={onCancel}
@@ -77,6 +80,7 @@ function NoteDetails({
   note,
   onEmit,
   onDeleteDraft,
+  onRetryFailed,
   onDownloadPdf,
   onReplace,
   onCancel,
@@ -85,6 +89,7 @@ function NoteDetails({
   note: NotaServico;
   onEmit: (note: NotaServico) => Promise<void>;
   onDeleteDraft: (note: NotaServico) => Promise<void>;
+  onRetryFailed: (note: NotaServico) => Promise<void>;
   onDownloadPdf: (note: NotaServico) => Promise<void>;
   onReplace: (note: NotaServico) => void;
   onCancel: (note: NotaServico) => Promise<void>;
@@ -105,7 +110,7 @@ function NoteDetails({
         <small>Descrição</small>
         <span>{note.descricao || '-'}</span>
         {note.mensagemErroFiscal || note.mensagemErro ? (
-          <ErrorMessage>{note.mensagemErroFiscal || note.mensagemErro}</ErrorMessage>
+          <ErrorMessage>{noteFiscalErrorMessage(note)}</ErrorMessage>
         ) : null}
       </NoteCopy>
       <PanelTitle>
@@ -122,6 +127,9 @@ function NoteDetails({
               onClick={() => onDeleteDraft(note)}
             />
           </>
+        ) : null}
+        {note.status === 'ERRO' ? (
+          <BusyButton label="Tentar novamente" busyLabel="Tentando..." onClick={() => onRetryFailed(note)} />
         ) : null}
         {canDownloadDanfse(note) ? (
           <BusyButton
@@ -140,7 +148,7 @@ function NoteDetails({
           </>
         ) : null}
       </ActionRow>
-      {note.status !== 'RASCUNHO' && !canDownloadDanfse(note) && note.status !== 'EMITIDA' ? (
+      {note.status !== 'RASCUNHO' && note.status !== 'ERRO' && !canDownloadDanfse(note) && note.status !== 'EMITIDA' ? (
         <Empty $compact>Nenhuma ação disponível para esta nota.</Empty>
       ) : null}
     </DetailsStack>
