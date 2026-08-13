@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 
 import type { AppDataState, AppView } from '../../types/app';
 import type { NotaServico } from '../../types/models';
-import { formatCurrency, formatDate, statusLabel } from '../../utils/formatters';
+import { formatCurrency, formatDate, readableEnum, statusLabel } from '../../utils/formatters';
 import { clientName, serviceName } from '../../utils/nfseSelectors';
 import { canDownloadDanfse } from '../NoteActions';
 import { Button, Empty, Panel, PanelTitle, StatusBadge, Toolbar } from '../ui';
@@ -110,6 +110,7 @@ export function NotesTable({
                   <td>{formatCurrency(nota.valorServico)}</td>
                   <td>
                     <StatusBadge $status={nota.status}>{statusLabel(nota.status)}</StatusBadge>
+                    <Muted>{readableEnum(nota.ambienteFiscal)}</Muted>
                   </td>
                   <td>
                     <Actions>

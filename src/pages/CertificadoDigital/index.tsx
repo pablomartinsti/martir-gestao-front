@@ -47,6 +47,22 @@ export function CertificatePage({ state, onSubmit, onRemoveCertificate }: Certif
             <h2>Certificado digital</h2>
           </PanelTitle>
           <FormGrid onSubmit={handleSubmit}>
+            <Grid $columns={2}>
+              <Field>
+                Ambiente fiscal padrao
+                <select
+                  name="ambienteFiscalPadrao"
+                  defaultValue={config?.ambienteFiscalPadrao ?? 'HOMOLOGACAO'}
+                >
+                  <option value="HOMOLOGACAO">Homologacao</option>
+                  <option value="PRODUCAO">Producao</option>
+                </select>
+              </Field>
+              <Field>
+                Serie DPS
+                <input name="serieDpsPadrao" defaultValue={config?.serieDpsPadrao ?? '1'} />
+              </Field>
+            </Grid>
             <CertificateBox>
               <PanelTitle>
                 <h3>Certificado A1</h3>

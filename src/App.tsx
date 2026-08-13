@@ -31,7 +31,7 @@ import { fetchAppResources, fetchAuthenticatedProfile } from './services/resourc
 import { createService, updateServiceStatus } from './services/servicesApi';
 import { GlobalStyle } from './styles/GlobalStyle';
 import type { AppDataState, AppModal, AppView, AuthMode, ToastState } from './types/app';
-import type { Cliente, NotaServico } from './types/models';
+import type { AmbienteFiscal, Cliente, NotaServico } from './types/models';
 import {
   compactBody,
   dateInputValue,
@@ -273,9 +273,19 @@ export function App() {
   }
 
   async function submitFiscalConfig(formData: FormData) {
+    const ambienteFiscalPadrao = String(
+      formData.get('ambienteFiscalPadrao') ||
+        data.configuracaoFiscal?.ambienteFiscalPadrao ||
+        'HOMOLOGACAO',
+    ) as AmbienteFiscal;
+    const serieDpsPadrao =
+      textField(formData, 'serieDpsPadrao') ||
+      data.configuracaoFiscal?.serieDpsPadrao ||
+      '1';
+
     await updateFiscalConfig(api, {
-      ambienteFiscalPadrao: data.configuracaoFiscal?.ambienteFiscalPadrao || 'PRODUCAO',
-      serieDpsPadrao: data.configuracaoFiscal?.serieDpsPadrao || '1',
+      ambienteFiscalPadrao,
+      serieDpsPadrao,
     });
 
     const certificateFile = formData.get('certificadoA1Arquivo');
@@ -323,7 +333,11 @@ export function App() {
   }
 
   async function emitRealNote(note: NotaServico) {
-    if (!window.confirm('Emitir esta NFS-e em producao agora?')) {
+    const ambiente = note.ambienteFiscal === 'HOMOLOGACAO' ? 'homologacao' : 'producao';
+    const complemento =
+      note.ambienteFiscal === 'HOMOLOGACAO' ? ' Essa nota e apenas teste.' : '';
+
+    if (!window.confirm(`Emitir esta NFS-e em ${ambiente} agora?${complemento}`)) {
       return;
     }
 
@@ -342,7 +356,11 @@ export function App() {
   }
 
   async function retryFailedNote(note: NotaServico) {
-    if (!window.confirm('Tentar emitir esta NFS-e novamente?')) {
+    const ambiente = note.ambienteFiscal === 'HOMOLOGACAO' ? 'homologacao' : 'producao';
+    const complemento =
+      note.ambienteFiscal === 'HOMOLOGACAO' ? ' Essa nota e apenas teste.' : '';
+
+    if (!window.confirm(`Tentar emitir esta NFS-e novamente em ${ambiente}?${complemento}`)) {
       return;
     }
 
@@ -398,7 +416,11 @@ export function App() {
       return;
     }
 
-    if (!window.confirm('Cancelar esta NFS-e em producao?')) {
+    const ambiente = note.ambienteFiscal === 'HOMOLOGACAO' ? 'homologacao' : 'producao';
+    const complemento =
+      note.ambienteFiscal === 'HOMOLOGACAO' ? ' Essa nota e apenas teste.' : '';
+
+    if (!window.confirm(`Cancelar esta NFS-e em ${ambiente}?${complemento}`)) {
       return;
     }
 

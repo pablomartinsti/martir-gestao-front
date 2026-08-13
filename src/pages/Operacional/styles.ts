@@ -187,6 +187,17 @@ export const CompanyActions = styled.div`
   }
 `;
 
+export const CompanyConfigForm = styled.form`
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(120px, 160px) auto;
+  align-items: end;
+  gap: 12px;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
 export const SummaryGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

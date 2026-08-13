@@ -20,15 +20,18 @@ export async function fetchAppResources(api: ApiClient) {
     api<Empresa>('/empresa'),
     api<ConfiguracaoFiscalEmpresa>('/empresa/configuracao-fiscal'),
   ]);
+  const notas = results[0].status === 'fulfilled' ? results[0].value : [];
+  const configuracaoFiscal =
+    results[4].status === 'fulfilled' ? results[4].value : null;
+  const ambienteFiscalPadrao = configuracaoFiscal?.ambienteFiscalPadrao;
 
   return {
-    notas:
-      results[0].status === 'fulfilled'
-        ? results[0].value.filter((nota) => nota.ambienteFiscal === 'PRODUCAO')
-        : [],
+    notas: ambienteFiscalPadrao
+      ? notas.filter((nota) => nota.ambienteFiscal === ambienteFiscalPadrao)
+      : notas,
     clientes: results[1].status === 'fulfilled' ? results[1].value : [],
     servicos: results[2].status === 'fulfilled' ? results[2].value : [],
     empresa: results[3].status === 'fulfilled' ? results[3].value : null,
-    configuracaoFiscal: results[4].status === 'fulfilled' ? results[4].value : null,
+    configuracaoFiscal,
   };
 }

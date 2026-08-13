@@ -52,6 +52,24 @@ export async function updateAdminCompanyIssuance(
   });
 }
 
+export async function updateAdminCompanyFiscalConfig(
+  api: ApiClient,
+  empresaId: string,
+  body: {
+    ambienteFiscalPadrao: AmbienteFiscal;
+    emissaoHabilitada?: boolean;
+    serieDpsPadrao: string;
+  },
+) {
+  return api<AdminEmpresaOperacionalResumo>(
+    `/admin/empresas/${empresaId}/configuracao-fiscal`,
+    {
+      body,
+      method: 'PATCH',
+    },
+  );
+}
+
 function buildQuery(filters: object): string {
   const params = new URLSearchParams();
 

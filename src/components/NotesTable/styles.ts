@@ -55,6 +55,9 @@ export const Actions = styled.div`
 `;
 
 export const Muted = styled.span`
+  display: block;
+  margin-top: 4px;
   color: var(--ink-500);
+  font-size: 0.78rem;
   font-weight: 800;
 `;

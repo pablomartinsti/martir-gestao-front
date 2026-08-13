@@ -4,6 +4,7 @@ import {
   listAdminCompanies,
   listAdminFiscalEvents,
   listAdminNotes,
+  updateAdminCompanyFiscalConfig,
   updateAdminCompanyIssuance,
   type AdminNotesFilters,
 } from '../../services/adminApi';
@@ -43,6 +44,7 @@ import {
   ActionCell,
   AdminGrid,
   CompanyActions,
+  CompanyConfigForm,
   CompanyDropdown,
   CompanyMeta,
   CompanyOptionButton,
@@ -75,7 +77,7 @@ interface FilterFormState {
 }
 
 const initialFilters: FilterFormState = {
-  ambienteFiscal: 'PRODUCAO',
+  ambienteFiscal: '',
   busca: '',
   criadoAte: '',
   criadoDe: '',
@@ -94,6 +96,7 @@ export function OperationalPage({ api }: OperationalPageProps) {
   const [loading, setLoading] = useState(false);
   const [eventLoading, setEventLoading] = useState(false);
   const [actionCompanyId, setActionCompanyId] = useState('');
+  const [fiscalConfigCompanyId, setFiscalConfigCompanyId] = useState('');
   const [certificateModalDismissed, setCertificateModalDismissed] = useState(false);
   const [error, setError] = useState('');
 
@@ -222,6 +225,45 @@ export function OperationalPage({ api }: OperationalPageProps) {
       setError(messageFromError(actionError));
     } finally {
       setActionCompanyId('');
+    }
+  }
+
+  async function submitCompanyFiscalConfig(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!selectedCompany) {
+      return;
+    }
+
+    const formData = new FormData(event.currentTarget);
+    const ambienteFiscalPadrao = String(
+      formData.get('ambienteFiscalPadrao') ||
+        selectedCompany.configuracaoFiscal.ambienteFiscalPadrao,
+    ) as AmbienteFiscal;
+    const serieDpsPadrao = String(
+      formData.get('serieDpsPadrao') ||
+        selectedCompany.configuracaoFiscal.serieDpsPadrao ||
+        '1',
+    ).trim();
+
+    setFiscalConfigCompanyId(selectedCompany.id);
+    setError('');
+
+    try {
+      const updatedCompany = await updateAdminCompanyFiscalConfig(api, selectedCompany.id, {
+        ambienteFiscalPadrao,
+        emissaoHabilitada: selectedCompany.configuracaoFiscal.emissaoHabilitada,
+        serieDpsPadrao,
+      });
+
+      setCompanies((current) =>
+        current.map((item) => (item.id === updatedCompany.id ? updatedCompany : item)),
+      );
+      await loadCompanyData(updatedCompany.id);
+    } catch (actionError) {
+      setError(messageFromError(actionError));
+    } finally {
+      setFiscalConfigCompanyId('');
     }
   }
 
@@ -410,6 +452,35 @@ export function OperationalPage({ api }: OperationalPageProps) {
                     <small>Serie DPS {selectedCompany.configuracaoFiscal.serieDpsPadrao}</small>
                   </KpiCard>
                 </SummaryGrid>
+
+                <CompanyConfigForm key={selectedCompany.id} onSubmit={submitCompanyFiscalConfig}>
+                  <Field>
+                    Ambiente do cliente
+                    <select
+                      name="ambienteFiscalPadrao"
+                      defaultValue={selectedCompany.configuracaoFiscal.ambienteFiscalPadrao}
+                    >
+                      <option value="HOMOLOGACAO">Homologacao</option>
+                      <option value="PRODUCAO">Producao</option>
+                    </select>
+                  </Field>
+                  <Field>
+                    Serie DPS
+                    <input
+                      name="serieDpsPadrao"
+                      defaultValue={selectedCompany.configuracaoFiscal.serieDpsPadrao}
+                      maxLength={20}
+                    />
+                  </Field>
+                  <Button
+                    type="submit"
+                    disabled={fiscalConfigCompanyId === selectedCompany.id}
+                  >
+                    {fiscalConfigCompanyId === selectedCompany.id
+                      ? 'Salvando...'
+                      : 'Salvar ambiente'}
+                  </Button>
+                </CompanyConfigForm>
 
                 <CompanyActions>
                   <Button

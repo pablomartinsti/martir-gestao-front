@@ -56,6 +56,7 @@ export function filterNotes(
       nota.numeroDps,
       nota.chaveAcesso,
       nota.status,
+      nota.ambienteFiscal,
       clientName(state, nota.clienteId),
       serviceName(state, nota.servicoId),
       serviceDetails(state, nota.servicoId),
