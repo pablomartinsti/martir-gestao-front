@@ -20,6 +20,7 @@ interface ModalProps {
   onRetryFailed: (note: NotaServico) => Promise<void>;
   onResolveError: (note: NotaServico) => Promise<void>;
   onDownloadPdf: (note: NotaServico) => Promise<void>;
+  onEditDraft: (note: NotaServico) => void;
   onReplace: (note: NotaServico) => void;
   onCancel: (note: NotaServico) => Promise<void>;
   onSubmitReplacement: (formData: FormData) => Promise<void>;
@@ -34,6 +35,7 @@ export function Modal({
   onRetryFailed,
   onResolveError,
   onDownloadPdf,
+  onEditDraft,
   onReplace,
   onCancel,
   onSubmitReplacement,
@@ -68,6 +70,7 @@ export function Modal({
               onRetryFailed={onRetryFailed}
               onResolveError={onResolveError}
               onDownloadPdf={onDownloadPdf}
+              onEditDraft={onEditDraft}
               onReplace={onReplace}
               onCancel={onCancel}
             />
@@ -86,6 +89,7 @@ function NoteDetails({
   onRetryFailed,
   onResolveError,
   onDownloadPdf,
+  onEditDraft,
   onReplace,
   onCancel,
 }: {
@@ -96,6 +100,7 @@ function NoteDetails({
   onRetryFailed: (note: NotaServico) => Promise<void>;
   onResolveError: (note: NotaServico) => Promise<void>;
   onDownloadPdf: (note: NotaServico) => Promise<void>;
+  onEditDraft: (note: NotaServico) => void;
   onReplace: (note: NotaServico) => void;
   onCancel: (note: NotaServico) => Promise<void>;
 }) {
@@ -124,6 +129,9 @@ function NoteDetails({
       <ActionRow>
         {note.status === 'RASCUNHO' ? (
           <>
+            <Button type="button" $tone="action" onClick={() => onEditDraft(note)}>
+              Editar rascunho
+            </Button>
             <BusyButton label="Emitir NFS-e" busyLabel="Emitindo..." onClick={() => onEmit(note)} />
             <BusyButton
               label="Excluir rascunho"

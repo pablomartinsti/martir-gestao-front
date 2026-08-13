@@ -117,7 +117,7 @@ export function NotesTable({
                       {nota.status === 'RASCUNHO' ? (
                         <>
                           <Button type="button" $tone="action" onClick={() => onShowDraft(nota)}>
-                            Ver
+                            Editar
                           </Button>
                           <Button
                             type="button"

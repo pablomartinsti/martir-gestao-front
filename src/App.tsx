@@ -26,6 +26,7 @@ import {
   replaceNfse,
   returnNoteToDraft,
   sendDps,
+  updateDraftNote,
 } from './services/nfseApi';
 import { fetchAppResources, fetchAuthenticatedProfile } from './services/resourcesApi';
 import { createService, updateServiceStatus } from './services/servicesApi';
@@ -65,10 +66,15 @@ export function App() {
   const [dashboardStartDate, setDashboardStartDate] = useState('');
   const [dashboardEndDate, setDashboardEndDate] = useState('');
   const [editingClientId, setEditingClientId] = useState('');
+  const [editingDraftId, setEditingDraftId] = useState('');
   const [modal, setModal] = useState<AppModal>(null);
   const [toast, setToast] = useState<ToastState>(null);
   const toastTimeout = useRef<number | null>(null);
   const api = useMemo(() => createApiClient(() => ({ apiUrl, token })), [apiUrl, token]);
+  const editingDraft = useMemo(
+    () => data.notas.find((nota) => nota.id === editingDraftId) ?? null,
+    [data.notas, editingDraftId],
+  );
 
   useEffect(() => {
     if (token) {
@@ -166,24 +172,40 @@ export function App() {
   }
 
   async function submitNote(formData: FormData) {
+    const noteId = textField(formData, 'notaId');
     const clienteId = textField(formData, 'clienteId') || findClientFromSearch(textField(formData, 'clienteBusca'))?.id || '';
 
     if (!clienteId) {
       throw new Error('Escolha um cliente cadastrado na lista antes de gerar a nota.');
     }
 
-    const note = await createNote(
-      api,
-      compactBody({
-        clienteId,
-        codigoMunicipioPrestacao: textField(formData, 'codigoMunicipioPrestacao'),
-        dataCompetencia: textField(formData, 'dataCompetencia'),
-        descricao: textField(formData, 'descricao'),
-        serieDps: textField(formData, 'serieDps'),
-        servicoId: textField(formData, 'servicoId'),
-        valorServico: parseCurrencyField(formData, 'valorServico'),
-      }),
-    );
+    const payload = compactBody({
+      clienteId,
+      codigoMunicipioPrestacao: textField(formData, 'codigoMunicipioPrestacao'),
+      dataCompetencia: textField(formData, 'dataCompetencia'),
+      descricao: textField(formData, 'descricao'),
+      numeroDps: textField(formData, 'numeroDps'),
+      serieDps: textField(formData, 'serieDps'),
+      servicoId: textField(formData, 'servicoId'),
+      valorServico: parseCurrencyField(formData, 'valorServico'),
+    });
+
+    if (noteId) {
+      const note = await updateDraftNote(api, noteId, payload);
+
+      await refreshResources();
+      setEditingDraftId('');
+      setView('notes');
+      setModal({
+        note,
+        title: 'Conferir rascunho atualizado',
+        type: 'note',
+      });
+      showToast('Rascunho atualizado. Confira os dados antes de emitir.', 'success');
+      return;
+    }
+
+    const note = await createNote(api, payload);
 
     await refreshResources();
     setView('notes');
@@ -453,6 +475,21 @@ export function App() {
     });
   }
 
+  function editDraft(note: NotaServico) {
+    if (note.status !== 'RASCUNHO') {
+      setModal({
+        note,
+        title: `Nota ${note.numeroNfse || note.numeroDps || note.id}`,
+        type: 'note',
+      });
+      return;
+    }
+
+    setEditingDraftId(note.id);
+    setModal(null);
+    setView('new-note');
+  }
+
   async function submitReplacement(formData: FormData) {
     const noteId = textField(formData, 'notaId');
     const note = data.notas.find((item) => item.id === noteId);
@@ -517,6 +554,7 @@ export function App() {
     if (nextView !== 'clients') {
       setEditingClientId('');
     }
+    setEditingDraftId('');
   }
 
   function clearSession() {
@@ -556,13 +594,7 @@ export function App() {
             search={search}
             onSearch={setSearch}
             onNavigate={navigate}
-            onShowDraft={(note) =>
-              setModal({
-                note,
-                title: note.status === 'RASCUNHO' ? 'Conferir rascunho' : `Nota ${note.numeroNfse || note.numeroDps || note.id}`,
-                type: 'note',
-              })
-            }
+            onShowDraft={editDraft}
             onEmit={(note) => safely(() => emitRealNote(note))}
             onDeleteDraft={(note) => safely(() => deleteDraft(note))}
             onDownloadPdf={(note) => safely(() => downloadNotePdf(note))}
@@ -571,7 +603,17 @@ export function App() {
           />
         );
       case 'new-note':
-        return <NewNotePage state={data} onSubmit={(formData) => safely(() => submitNote(formData))} />;
+        return (
+          <NewNotePage
+            state={data}
+            draft={editingDraft}
+            onCancelEdit={() => {
+              setEditingDraftId('');
+              setView('notes');
+            }}
+            onSubmit={(formData) => safely(() => submitNote(formData))}
+          />
+        );
       case 'clients':
         return (
           <ClientsPage
@@ -648,6 +690,7 @@ export function App() {
         onRetryFailed={(note) => safely(() => retryFailedNote(note))}
         onResolveError={(note) => safely(() => resolveFailedNote(note))}
         onDownloadPdf={(note) => safely(() => downloadNotePdf(note))}
+        onEditDraft={editDraft}
         onReplace={createReplacementDraft}
         onCancel={(note) => safely(() => cancelRealNote(note))}
         onSubmitReplacement={(formData) => safely(() => submitReplacement(formData))}

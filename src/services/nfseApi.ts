@@ -11,6 +11,17 @@ export function createNote(api: ApiClient, body: Record<string, unknown>) {
   });
 }
 
+export function updateDraftNote(
+  api: ApiClient,
+  noteId: string,
+  body: Record<string, unknown>,
+) {
+  return api<NotaServico>(`/notas-servico/${noteId}`, {
+    method: 'PUT',
+    body,
+  });
+}
+
 export interface ReplaceNoteBody {
   clienteId: string;
   servicoId: string;

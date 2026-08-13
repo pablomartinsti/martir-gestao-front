@@ -1,26 +1,59 @@
-import { useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 
 import type { AppDataState } from '../../types/app';
-import type { Cliente } from '../../types/models';
+import type { Cliente, NotaServico } from '../../types/models';
 import { formatDocument } from '../../utils/formatters';
-import { normalizeSearchText, onlyNumbers, todayInputValue } from '../../utils/forms';
+import {
+  currencyInputValue,
+  dateInputValue,
+  normalizeSearchText,
+  onlyNumbers,
+  todayInputValue,
+} from '../../utils/forms';
 import { serviceOptionLabel } from '../../utils/serviceLabels';
 import { Button, Eyebrow, Field, FieldHelp, FormGrid, Grid, Panel, SectionHead } from '../../components/ui';
 import { ClientField } from './styles';
 
 interface NewNotePageProps {
   state: AppDataState;
+  draft?: NotaServico | null;
+  onCancelEdit?: () => void;
   onSubmit: (formData: FormData) => Promise<void>;
 }
 
-export function NewNotePage({ state, onSubmit }: NewNotePageProps) {
+export function NewNotePage({
+  state,
+  draft = null,
+  onCancelEdit,
+  onSubmit,
+}: NewNotePageProps) {
   const [clientSearch, setClientSearch] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const activeClients = useMemo(() => state.clientes.filter((cliente) => cliente.ativo), [state.clientes]);
-  const activeServices = useMemo(() => state.servicos.filter((servico) => servico.ativo), [state.servicos]);
+  const activeClients = useMemo(
+    () =>
+      state.clientes.filter(
+        (cliente) => cliente.ativo || cliente.id === draft?.clienteId,
+      ),
+    [state.clientes, draft?.clienteId],
+  );
+  const activeServices = useMemo(
+    () =>
+      state.servicos.filter(
+        (servico) => servico.ativo || servico.id === draft?.servicoId,
+      ),
+    [state.servicos, draft?.servicoId],
+  );
   const selectedClient = findClientFromSearch(activeClients, clientSearch);
-  const serieDps = state.configuracaoFiscal?.serieDpsPadrao || '1';
-  const codigoMunicipioPrestacao = state.empresa?.codigoMunicipioIbge || '';
+  const draftClient = activeClients.find((cliente) => cliente.id === draft?.clienteId);
+  const serieDps = draft?.serieDps || state.configuracaoFiscal?.serieDpsPadrao || '1';
+  const codigoMunicipioPrestacao =
+    draft?.codigoMunicipioPrestacao || state.empresa?.codigoMunicipioIbge || '';
+  const dataCompetencia =
+    dateInputValue(draft?.dataCompetencia) || todayInputValue();
+
+  useEffect(() => {
+    setClientSearch(draftClient ? clientOptionLabel(draftClient) : '');
+  }, [draft?.id, draftClient]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,16 +71,22 @@ export function NewNotePage({ state, onSubmit }: NewNotePageProps) {
       <SectionHead>
         <div>
           <Eyebrow>NFS-e</Eyebrow>
-          <h1>Emitir nota</h1>
-          <p>Preencha os dados, gere o rascunho e confira antes de emitir.</p>
+          <h1>{draft ? 'Editar rascunho' : 'Emitir nota'}</h1>
+          <p>
+            {draft
+              ? 'Ajuste os dados do rascunho antes de emitir.'
+              : 'Preencha os dados, gere o rascunho e confira antes de emitir.'}
+          </p>
         </div>
       </SectionHead>
       <Panel>
-        <FormGrid onSubmit={handleSubmit}>
+        <FormGrid key={draft?.id || 'novo-rascunho'} onSubmit={handleSubmit}>
+          <input type="hidden" name="notaId" value={draft?.id || ''} />
           <input type="hidden" name="clienteId" value={selectedClient?.id || ''} />
           <input type="hidden" name="serieDps" value={serieDps} />
+          <input type="hidden" name="numeroDps" value={draft?.numeroDps || ''} />
           <input type="hidden" name="codigoMunicipioPrestacao" value={codigoMunicipioPrestacao} />
-          <input type="hidden" name="dataCompetencia" value={todayInputValue()} />
+          <input type="hidden" name="dataCompetencia" value={dataCompetencia} />
           <Grid $columns={2}>
             <ClientField>
               Cliente
@@ -71,7 +110,7 @@ export function NewNotePage({ state, onSubmit }: NewNotePageProps) {
             </ClientField>
             <Field>
               Serviço
-              <select name="servicoId" required defaultValue="">
+              <select name="servicoId" required defaultValue={draft?.servicoId || ''}>
                 <option value="">Selecione</option>
                 {activeServices.map((servico) => (
                   <option key={servico.id} value={servico.id}>
@@ -84,15 +123,34 @@ export function NewNotePage({ state, onSubmit }: NewNotePageProps) {
           </Grid>
           <Field>
             Valor do serviço
-            <input name="valorServico" inputMode="decimal" placeholder="Ex.: 200 ou 200,00" required />
+            <input
+              name="valorServico"
+              inputMode="decimal"
+              defaultValue={draft ? currencyInputValue(draft.valorServico) : ''}
+              placeholder="Ex.: 200 ou 200,00"
+              required
+            />
           </Field>
           <Field>
             Descrição
-            <textarea name="descricao" required />
+            <textarea name="descricao" defaultValue={draft?.descricao || ''} required />
           </Field>
-          <Button type="submit" disabled={submitting}>
-            {submitting ? 'Gerando rascunho...' : 'Gerar rascunho'}
-          </Button>
+          <Grid $columns={draft ? 2 : 1}>
+            <Button type="submit" disabled={submitting}>
+              {draft
+                ? submitting
+                  ? 'Salvando rascunho...'
+                  : 'Salvar rascunho'
+                : submitting
+                  ? 'Gerando rascunho...'
+                  : 'Gerar rascunho'}
+            </Button>
+            {draft && onCancelEdit ? (
+              <Button type="button" $tone="ghost" onClick={onCancelEdit}>
+                Cancelar
+              </Button>
+            ) : null}
+          </Grid>
         </FormGrid>
       </Panel>
     </>
