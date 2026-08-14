@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 
 import type { AppDataState, AppModal } from '../../types/app';
 import type { NotaServico } from '../../types/models';
@@ -190,15 +190,23 @@ function ReplacementForm({
   onClose: () => void;
 }) {
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const activeServices = state.servicos.filter((servico) => servico.ativo);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (submittingRef.current) {
+      return;
+    }
+
+    submittingRef.current = true;
     setSubmitting(true);
 
     try {
       await onSubmitReplacement(new FormData(event.currentTarget));
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   }
@@ -257,12 +265,19 @@ function BusyButton({
   onClick: () => Promise<void>;
 }) {
   const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
 
   async function handleClick() {
+    if (busyRef.current) {
+      return;
+    }
+
+    busyRef.current = true;
     setBusy(true);
     try {
       await onClick();
     } finally {
+      busyRef.current = false;
       setBusy(false);
     }
   }

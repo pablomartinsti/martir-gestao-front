@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 
 import type { AppDataState } from '../../types/app';
 import type { Cliente, NotaServico } from '../../types/models';
@@ -29,6 +29,7 @@ export function NewNotePage({
 }: NewNotePageProps) {
   const [clientSearch, setClientSearch] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const activeClients = useMemo(
     () =>
       state.clientes.filter(
@@ -57,11 +58,18 @@ export function NewNotePage({
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (submittingRef.current) {
+      return;
+    }
+
+    submittingRef.current = true;
     setSubmitting(true);
 
     try {
       await onSubmit(new FormData(event.currentTarget));
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   }
