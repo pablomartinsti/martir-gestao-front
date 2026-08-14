@@ -523,7 +523,7 @@ export function App() {
       motivoSubstituicao,
       serieDps: note.serieDps,
       servicoId,
-      valorServico: parseCurrencyField(formData, 'valorServico'),
+      valorServico: note.valorServico,
     });
 
     await refreshResources();

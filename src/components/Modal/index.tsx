@@ -3,7 +3,6 @@ import { useState, type FormEvent } from 'react';
 import type { AppDataState, AppModal } from '../../types/app';
 import type { NotaServico } from '../../types/models';
 import { formatCurrency, noteFiscalErrorMessage, statusLabel } from '../../utils/formatters';
-import { currencyInputValue } from '../../utils/forms';
 import { clientName, serviceName } from '../../utils/nfseSelectors';
 import { serviceOptionLabel } from '../../utils/serviceLabels';
 import { canDownloadDanfse } from '../NoteActions';
@@ -207,21 +206,15 @@ function ReplacementForm({
   return (
     <FormGrid onSubmit={handleSubmit}>
       <input type="hidden" name="notaId" value={note.id} />
+      <input type="hidden" name="valorServico" value={String(note.valorServico)} />
       <MetaGrid>
         <MetaBox label="Nota original" value={note.numeroNfse || note.numeroDps || '-'} />
         <MetaBox label="Cliente" value={clientName(state, note.clienteId)} />
         <MetaBox label="Valor atual" value={formatCurrency(note.valorServico)} />
       </MetaGrid>
-      <Field>
-        Valor da nota substituta
-        <input
-          name="valorServico"
-          inputMode="decimal"
-          defaultValue={currencyInputValue(note.valorServico)}
-          placeholder="Ex.: 200 ou 200,00"
-          required
-        />
-      </Field>
+      <ResolutionHint>
+        Na substituicao, cliente, competencia e valor permanecem iguais aos da nota original. Para corrigir valor, cancele esta nota e emita uma nova.
+      </ResolutionHint>
       <Field>
         Serviço da nota substituta
         <select name="servicoId" defaultValue={note.servicoId} required>
