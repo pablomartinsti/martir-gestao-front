@@ -3,7 +3,6 @@ import { useState, type FormEvent } from 'react';
 import type { AppDataState, AppModal } from '../../types/app';
 import type { NotaServico } from '../../types/models';
 import { formatCurrency, noteFiscalErrorMessage, statusLabel } from '../../utils/formatters';
-import { currencyInputValue } from '../../utils/forms';
 import { clientName, serviceName } from '../../utils/nfseSelectors';
 import { serviceOptionLabel } from '../../utils/serviceLabels';
 import { canDownloadDanfse } from '../NoteActions';
@@ -213,18 +212,8 @@ function ReplacementForm({
         <MetaBox label="Valor atual" value={formatCurrency(note.valorServico)} />
       </MetaGrid>
       <ResolutionHint>
-        Na substituicao, cliente e competencia permanecem iguais aos da nota original.
+        Na substituicao, cliente, competencia e valor permanecem iguais aos da nota original. Para corrigir valor, cancele esta NFS-e e emita uma nova.
       </ResolutionHint>
-      <Field>
-        Valor da nota substituta
-        <input
-          name="valorServico"
-          inputMode="decimal"
-          defaultValue={currencyInputValue(note.valorServico)}
-          placeholder="Ex.: 200 ou 200,00"
-          required
-        />
-      </Field>
       <Field>
         Serviço da nota substituta
         <select name="servicoId" defaultValue={note.servicoId} required>
