@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 
-import { GOOGLE_CLIENT_ID } from '../../config';
 import { fetchAddressByCep } from '../../services/cepApi';
 import { fetchCompanyByCnpj } from '../../services/cnpjApi';
 import type { AuthMode } from '../../types/app';
@@ -14,47 +13,21 @@ import {
   AuthHead,
   AuthPanel,
   AuthShell,
-  Divider,
-  GoogleBox,
   PasswordRow,
   Tabs,
 } from './styles';
-
-type GoogleCredentialResponse = {
-  credential?: string;
-};
-
-declare global {
-  interface Window {
-    google?: {
-      accounts?: {
-        id?: {
-          initialize: (config: {
-            client_id: string;
-            callback: (response: GoogleCredentialResponse) => void;
-          }) => void;
-          renderButton: (element: HTMLElement, options: Record<string, unknown>) => void;
-        };
-      };
-    };
-  }
-}
 
 interface LoginPageProps {
   authMode: AuthMode;
   onAuthModeChange: (mode: AuthMode) => void;
   onLogin: (formData: FormData) => Promise<void>;
-  onGoogleLogin: (credential: string) => Promise<void>;
   onOnboard: (formData: FormData) => Promise<void>;
 }
-
-let googleScriptPromise: Promise<void> | null = null;
 
 export function LoginPage({
   authMode,
   onAuthModeChange,
   onLogin,
-  onGoogleLogin,
   onOnboard,
 }: LoginPageProps) {
   const [submitting, setSubmitting] = useState(false);
@@ -279,14 +252,10 @@ export function LoginPage({
                 </Grid>
               </>
             ) : (
-              <>
-                {GOOGLE_CLIENT_ID ? <GoogleLoginButton onGoogleLogin={onGoogleLogin} /> : null}
-                {GOOGLE_CLIENT_ID ? <Divider>ou</Divider> : null}
-                <Field>
-                  E-mail
-                  <input name="email" type="email" autoComplete="email" required />
-                </Field>
-              </>
+              <Field>
+                E-mail
+                <input name="email" type="email" autoComplete="email" required />
+              </Field>
             )}
             <Field>
               Senha
@@ -315,86 +284,6 @@ export function LoginPage({
       </AuthPanel>
     </AuthShell>
   );
-}
-
-function GoogleLoginButton({ onGoogleLogin }: { onGoogleLogin: (credential: string) => Promise<void> }) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const [status, setStatus] = useState('');
-
-  useEffect(() => {
-    const container = containerRef.current;
-
-    if (!container || !GOOGLE_CLIENT_ID) {
-      return;
-    }
-
-    loadGoogleScript()
-      .then(() => {
-        if (!window.google?.accounts?.id) {
-          throw new Error('Google Identity indisponivel.');
-        }
-
-        window.google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: (response) => {
-            if (response.credential) {
-              void onGoogleLogin(response.credential);
-            }
-          },
-        });
-        window.google.accounts.id.renderButton(container, {
-          shape: 'rectangular',
-          size: 'large',
-          text: 'signin_with',
-          theme: 'outline',
-          width: 360,
-        });
-        setStatus('');
-      })
-      .catch(() => setStatus('Nao foi possivel carregar o login Google.'));
-  }, [onGoogleLogin]);
-
-  return (
-    <GoogleBox>
-      <div ref={containerRef} />
-      <small>{status}</small>
-    </GoogleBox>
-  );
-}
-
-function loadGoogleScript(): Promise<void> {
-  if (window.google?.accounts?.id) {
-    return Promise.resolve();
-  }
-
-  if (googleScriptPromise) {
-    return googleScriptPromise;
-  }
-
-  googleScriptPromise = new Promise((resolve, reject) => {
-    const existing = document.querySelector<HTMLScriptElement>('script[data-google-identity]');
-
-    if (existing) {
-      existing.addEventListener('load', () => resolve(), { once: true });
-      existing.addEventListener('error', () => reject(new Error('Google Identity indisponivel.')), {
-        once: true,
-      });
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    script.dataset.googleIdentity = 'true';
-    script.addEventListener('load', () => resolve(), { once: true });
-    script.addEventListener('error', () => reject(new Error('Google Identity indisponivel.')), {
-      once: true,
-    });
-    document.head.appendChild(script);
-  });
-
-  return googleScriptPromise;
 }
 
 function getFieldValue(form: HTMLFormElement | null, field: string): string {

@@ -131,27 +131,3 @@ export const PasswordRow = styled.div`
   grid-template-columns: 1fr auto;
   gap: 8px;
 `;
-
-export const GoogleBox = styled.div`
-  display: grid;
-  justify-content: center;
-  gap: 6px;
-  color: var(--ink-500);
-  font-size: 0.78rem;
-`;
-
-export const Divider = styled.div`
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 10px;
-  color: var(--ink-500);
-  font-size: 0.76rem;
-
-  &::before,
-  &::after {
-    content: '';
-    height: 1px;
-    background: var(--line);
-  }
-`;

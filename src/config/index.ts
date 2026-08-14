@@ -1,7 +1,9 @@
 const PRODUCTION_API_URL = 'https://nota-fiscal.martircontabil.com.br';
+const DEVELOPMENT_API_URL = 'http://localhost:3333';
 
-export const DEFAULT_API_URL = import.meta.env.VITE_API_URL || PRODUCTION_API_URL;
-export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+export const DEFAULT_API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? DEVELOPMENT_API_URL : PRODUCTION_API_URL);
 
 export const STORAGE_KEYS = {
   apiUrl: 'martir.apiUrl',

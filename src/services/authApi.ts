@@ -21,13 +21,6 @@ export function login(
   });
 }
 
-export function loginWithGoogle(api: ApiClient, credential: string) {
-  return api<LoginResponse>('/sessoes/google', {
-    method: 'POST',
-    body: { credential },
-  });
-}
-
 export function onboard(api: ApiClient, input: OnboardingInput) {
   return api('/onboarding', {
     method: 'POST',

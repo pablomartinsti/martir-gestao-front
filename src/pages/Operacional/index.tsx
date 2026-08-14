@@ -711,11 +711,15 @@ function eventTypeLabel(type: string): string {
 }
 
 function eventStatusLabel(status: StatusEventoFiscal): string {
-  return status === 'SUCESSO' ? 'Sucesso' : 'Erro';
+  if (status === 'SUCESSO') return 'Sucesso';
+  if (status === 'PENDENTE') return 'Pendente';
+  return 'Erro';
 }
 
 function eventStatusToBadge(status: StatusEventoFiscal): StatusNota {
-  return status === 'SUCESSO' ? 'EMITIDA' : 'ERRO';
+  if (status === 'SUCESSO') return 'EMITIDA';
+  if (status === 'PENDENTE') return 'PROCESSANDO';
+  return 'ERRO';
 }
 
 function messageFromError(error: unknown): string {

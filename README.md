@@ -19,19 +19,24 @@ npm run dev
 Por padrao, o painel usa `http://localhost:3333` em desenvolvimento e
 `https://nota-fiscal.martircontabil.com.br` fora do localhost.
 
-Para habilitar o botao de login com Google, crie um `.env.local`:
+Para sobrescrever a API, crie um `.env.local`:
 
 ```bash
-VITE_GOOGLE_CLIENT_ID="client-id-do-google"
+VITE_API_URL="http://localhost:3333"
 ```
 
 ## Estrutura
 
 ```text
 src/
-  app/        estado, render principal e controle de eventos
-  domain/     tipos do dominio da API
-  features/   telas e acoes por modulo
-  shared/     HTTP, storage, formatadores e utilitarios
-  styles/     CSS separado por responsabilidade
+  components/ componentes reutilizaveis
+  config/     configuracoes de ambiente
+  hooks/      estado e acoes reutilizaveis das telas
+  navigation/ itens de navegacao
+  pages/      telas do painel
+  routes/     composicao de rotas e telas
+  services/   clientes HTTP e integracoes externas
+  styles/     estilos globais
+  types/      tipos do dominio da API
+  utils/      formatadores, seletores e helpers de formulario
 ```
