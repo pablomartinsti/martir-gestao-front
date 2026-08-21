@@ -6,6 +6,7 @@ export interface CnpjCompany {
   cep: string;
   endereco: string;
   numero: string;
+  complemento: string;
   bairro: string;
   cidade: string;
   uf: string;
@@ -21,6 +22,7 @@ interface BrasilApiCnpjResponse {
   cep?: string;
   logradouro?: string;
   numero?: string;
+  complemento?: string;
   bairro?: string;
   municipio?: string;
   uf?: string;
@@ -57,6 +59,7 @@ export async function fetchCompanyByCnpj(cnpj: string): Promise<CnpjCompany> {
     cep: data.cep || '',
     endereco: data.logradouro || '',
     numero: data.numero || '',
+    complemento: data.complemento || '',
     bairro: data.bairro || '',
     cidade: data.municipio || '',
     uf: data.uf || '',

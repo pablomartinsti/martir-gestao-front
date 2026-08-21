@@ -77,6 +77,7 @@ export function useAuthActions({
         cidade: textField(formData, 'cidade'),
         cnpj: textField(formData, 'cnpj'),
         codigoMunicipioIbge: textField(formData, 'codigoMunicipioIbge'),
+        complemento: textField(formData, 'complemento'),
         email: textField(formData, 'empresaEmail'),
         endereco: textField(formData, 'endereco'),
         inscricaoMunicipal: textField(formData, 'inscricaoMunicipal'),

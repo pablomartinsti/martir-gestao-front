@@ -80,6 +80,7 @@ export function LoginPage({
       setFieldValue(form, 'cep', company.cep);
       setFieldValue(form, 'endereco', company.endereco);
       setFieldValue(form, 'numero', company.numero);
+      setFieldValue(form, 'complemento', company.complemento);
       setFieldValue(form, 'bairro', company.bairro);
       setFieldValue(form, 'cidade', company.cidade);
       setFieldValue(form, 'uf', company.uf);
@@ -218,19 +219,25 @@ export function LoginPage({
                     <input name="numero" />
                   </Field>
                   <Field>
+                    Complemento
+                    <input name="complemento" maxLength={156} />
+                  </Field>
+                  <Field>
                     Bairro
                     <input name="bairro" />
                   </Field>
+                </Grid>
+                <Grid $columns={2}>
                   <Field>
                     Cidade
                     <input name="cidade" required />
                   </Field>
-                </Grid>
-                <Grid $columns={3}>
                   <Field>
                     UF
                     <input name="uf" maxLength={2} required />
                   </Field>
+                </Grid>
+                <Grid $columns={2}>
                   <Field>
                     Codigo municipio IBGE
                     <input name="codigoMunicipioIbge" inputMode="numeric" />

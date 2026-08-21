@@ -94,6 +94,7 @@ export function ClientsPage({
       setFieldValue(form, 'cep', company.cep);
       setFieldValue(form, 'endereco', company.endereco);
       setFieldValue(form, 'numero', company.numero);
+      setFieldValue(form, 'complemento', company.complemento);
       setFieldValue(form, 'bairro', company.bairro);
       setFieldValue(form, 'cidade', company.cidade);
       setFieldValue(form, 'uf', company.uf);
@@ -230,6 +231,12 @@ export function ClientsPage({
                 <input name="numero" defaultValue={clientValue(editingClient, 'numero')} />
               </Field>
               <Field>
+                Complemento
+                <input name="complemento" defaultValue={clientValue(editingClient, 'complemento')} maxLength={156} />
+              </Field>
+            </Grid>
+            <Grid $columns={2}>
+              <Field>
                 Bairro
                 <input name="bairro" defaultValue={clientValue(editingClient, 'bairro')} />
               </Field>
@@ -274,7 +281,9 @@ function clientValue(cliente: Cliente | undefined, field: keyof Cliente): string
 
 function clientMeta(cliente: Cliente): string {
   const contato = [cliente.email, cliente.telefone].filter(Boolean).join(' / ') || 'sem contato';
-  const endereco = [cliente.endereco, cliente.numero, cliente.bairro].filter(Boolean).join(', ') || 'endereco pendente';
+  const endereco =
+    [cliente.endereco, cliente.numero, cliente.complemento, cliente.bairro].filter(Boolean).join(', ') ||
+    'endereco pendente';
   const codigoIbge = cliente.codigoMunicipioIbge ? `IBGE ${cliente.codigoMunicipioIbge}` : 'IBGE pendente';
 
   return [

@@ -140,6 +140,7 @@ export interface Empresa {
   cep?: string;
   endereco?: string;
   numero?: string;
+  complemento?: string;
   bairro?: string;
   cidade: string;
   uf: string;
@@ -175,6 +176,7 @@ export interface Cliente {
   cep?: string;
   endereco?: string;
   numero?: string;
+  complemento?: string;
   bairro?: string;
   cidade: string;
   uf: string;

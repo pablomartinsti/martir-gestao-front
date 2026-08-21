@@ -33,6 +33,7 @@ export function useClientsActions({
       cep: textField(formData, 'cep'),
       cidade: textField(formData, 'cidade'),
       codigoMunicipioIbge: textField(formData, 'codigoMunicipioIbge'),
+      complemento: textField(formData, 'complemento'),
       email: textField(formData, 'email'),
       endereco: textField(formData, 'endereco'),
       nomeRazaoSocial: textField(formData, 'nomeRazaoSocial'),
